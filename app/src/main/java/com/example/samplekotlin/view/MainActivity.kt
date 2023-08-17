@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
             ContextCompat.getColor(this, R.color.yellow)
         )
 
-        
+        //test log
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

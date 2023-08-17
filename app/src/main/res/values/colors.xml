@@ -2,4 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="tabUnselected">#5BC384</color>
+    <color name="unSelectedTabTextColor">#00632B</color>
+    <color name="theme">#49BB79</color>
+    <color name="watering_needs">#49BB79</color>
+    <color name="yellow">#FFFF63</color>
+    <color name="dark_white">#FAFAFA</color>
 </resources>

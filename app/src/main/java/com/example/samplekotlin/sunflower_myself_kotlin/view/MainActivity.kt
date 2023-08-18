@@ -1,4 +1,4 @@
-package com.example.samplekotlin.adpater.view
+package com.example.sunflower_myself_kotlin.adpater.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,8 +8,8 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
-import com.example.samplekotlin.R
-import com.example.samplekotlin.adpater.ViewPagerAdapter
+import com.example.sunflower_myself_kotlin.R
+import com.example.sunflower_myself_kotlin.adpater.ViewPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -53,11 +53,7 @@ class MainActivity : AppCompatActivity() {
             //selected Tab
             ContextCompat.getColor(this, R.color.yellow)
         )
-<<<<<<< HEAD
-=======
 
-        
->>>>>>> f262d4b55864a7d8b9414f0100440d94a80d3519
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

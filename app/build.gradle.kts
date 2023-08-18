@@ -25,6 +25,12 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android.txt")
+            )
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

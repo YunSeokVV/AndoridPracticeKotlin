@@ -53,11 +53,7 @@ class MainActivity : AppCompatActivity() {
             //selected Tab
             ContextCompat.getColor(this, R.color.yellow)
         )
-<<<<<<< HEAD
-=======
 
-        
->>>>>>> f262d4b55864a7d8b9414f0100440d94a80d3519
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

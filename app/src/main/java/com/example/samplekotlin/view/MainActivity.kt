@@ -11,9 +11,14 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.samplekotlin.R
 import com.example.samplekotlin.adpater.ViewPagerAdapter
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var menuItem : MenuItem
+
+    var filterVisible : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 //                1 -> resources.getDrawable(R.drawable.ic_plant_list_active)
 //                else -> throw IllegalArgumentException("Invalid position")
 //            }
+
         }.attach()
 
         tableLayout.getTabAt(0)?.setIcon(R.drawable.ic_my_garden_active)
@@ -54,23 +60,41 @@ class MainActivity : AppCompatActivity() {
             ContextCompat.getColor(this, R.color.yellow)
         )
 
+        // OnTabSelectedListner 는 익명객체로 새로운 객체를 만드는 것이다.
+        tableLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.position){
+                    0 -> {
+                        changeMenuItemVisibility(false)
+                    }
+
+                    1 -> {
+                        changeMenuItemVisibility(true)
+                    }
+
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // 메뉴 리소스 파일을 인플레이트하여 액션바 또는 툴바에 메뉴를 추가
         menuInflater.inflate(R.menu.top_nav_menu, menu)
-        return true
+        menuItem = menu.findItem(R.id.settings)
+        println("onCreateOptionsMenu " + filterVisible)
+        changeMenuItemVisibility(filterVisible)
+        filterVisible = true
+        return false
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // 메뉴 아이템 선택 시 동작을 처리
-        return when (item.itemId) {
-            R.id.settings -> {
-                // 'Settings' 메뉴 아이템 선택 시 동작을 정의
-                // 예를 들어, 설정 화면으로 이동하거나 다른 작업 수행
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    private fun changeMenuItemVisibility(filterVisible : Boolean){
+        menuItem.setVisible(filterVisible)
         }
     }
-}

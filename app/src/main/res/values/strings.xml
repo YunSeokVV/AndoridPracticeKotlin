@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">SunFlower-Myself-Kotlin</string>
     <string name="Sunflower">Sunflower</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="empty_garden">Your garden is empty</string>
 </resources>

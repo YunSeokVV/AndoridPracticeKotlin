@@ -36,7 +36,12 @@ android {
 }
 
 dependencies {
-
+    implementation("com.github.bumptech.glide:glide:4.11.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // retrofit 통신을 사용해서 데이터를 받아올때 json 형태가 아닌 문자열이나 숫자로 받아올때 scalars 라이브러리가 필요하다
+    //implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    // Object 타입을 JSON 또는 JSON을 Object형태로 바꿔주는 역할을 해주는 라이브러리
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.8.0")
@@ -44,4 +49,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    implementation("androidx.room:room-runtime:2.4.0")
+    annotationProcessor("androidx.room:room-compiler:2.4.0")
 }

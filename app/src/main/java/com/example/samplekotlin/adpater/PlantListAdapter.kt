@@ -24,6 +24,7 @@ class PlantListAdapter (private val data: List<Plant>) : RecyclerView.Adapter<Pl
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        //asdfasfdafsdasdfsdaf
         LayoutInflater.from(parent.context)
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.plant_item_list,parent,false)
         return ViewHolder(itemView)

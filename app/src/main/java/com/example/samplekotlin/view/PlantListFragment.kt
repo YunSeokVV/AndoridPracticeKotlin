@@ -43,7 +43,6 @@ class PlantListFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_plant_list, container,false)
 
         recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        println("onCreateView called")
 
         for(i : Int in 0..16){
             imgURL(plantImagesID[i], i)
@@ -64,14 +63,10 @@ class PlantListFragment : Fragment() {
             override fun onResponse(call: Call<URLs>, response: Response<URLs>) {
                 if(response.isSuccessful()) {
 
-                    println("count $count")
-                    println(response.body()?.urls!!.get("raw").toString())
-
                     var plantVO = Plant(count.toLong(), plantNames[count], count, response.body()?.urls!!.get("raw").toString())
                     data.add(plantVO)
 
                     if(data.size == 16){
-                        println("the last data received")
 
                         plantlistAdapter = PlantListAdapter(data, context!!)
                         recyclerView.adapter = plantlistAdapter
@@ -90,14 +85,13 @@ class PlantListFragment : Fragment() {
                     }
 
                 } else { // code == 400
-                    println("fail")
+
                 }
 
             }
 
             override fun onFailure(call: Call<URLs>, t: Throwable) {
-                println("t.message")
-                println(t.message)
+
             }
         })
     }
@@ -105,7 +99,6 @@ class PlantListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id : Int = item.itemId
         if(id == R.id.settings){
-            println("R.id.settings")
             filterPlants(!filterAll)
             filterAll = !filterAll
             return true

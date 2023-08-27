@@ -88,7 +88,6 @@ class MainActivity : AppCompatActivity() {
         // 메뉴 리소스 파일을 인플레이트하여 액션바 또는 툴바에 메뉴를 추가
         menuInflater.inflate(R.menu.top_nav_menu, menu)
         menuItem = menu.findItem(R.id.settings)
-        println("onCreateOptionsMenu " + filterVisible)
         changeMenuItemVisibility(filterVisible)
         filterVisible = true
         return false

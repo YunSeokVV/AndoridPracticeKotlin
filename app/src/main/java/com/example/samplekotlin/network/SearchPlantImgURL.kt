@@ -16,8 +16,6 @@ class SearchPlantImgURL (val plantID : String){
 
 
     fun imgURL(plnatURL : String) : String {
-        println("chck here")
-        println(plnatURL)
 
         return plnatURL
     }
@@ -27,33 +25,19 @@ class SearchPlantImgURL (val plantID : String){
         repos.enqueue(object : Callback<URLs> {
             override fun onResponse(call: Call<URLs>, response: Response<URLs>) {
                 if(response.isSuccessful()) {
-                    println("success")
-                    println(response)
-                    println("${response::class.simpleName}")
-                    println("response.body().toString()")
-                    println(response.body().toString())
-                    println("response.body()")
-                    println(response.body())
-
-                    println("response.body()?.urls")
-                    println(response.body()?.urls)
-
                     //LinkedTreeMap임.
-                    println("${response.body()?.urls!!::class.simpleName}")
-                    println("test")
-                    println(response.body()?.urls!!.get("raw"))
-                    //imgURL = response.body()?.urls!!.get("raw").toString()
+                    //println("${response.body()?.urls!!::class.simpleName}")
+
 
                     imgURL(response.body()?.urls!!.get("raw").toString())
                 } else { // code == 400
-                    println("fail")
+
                 }
 
             }
 
             override fun onFailure(call: Call<URLs>, t: Throwable) {
-                println("t.message")
-                println(t.message)
+
             }
         })
     }

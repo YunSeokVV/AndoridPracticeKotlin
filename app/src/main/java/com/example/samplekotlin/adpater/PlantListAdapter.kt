@@ -30,9 +30,6 @@ class PlantListAdapter (private val data: List<Plant>, private val context: Cont
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int){
-        val plantName:String = data.get(position).name
-        val imageResource:String = data.get(position).imageResource
-
 //        holder.plantName.setText(plantName)
 //        holder.plantImage.setImageResource(imageResource)
 //        // 이미지뷰의 모서리를 둥글게 해주는 역할

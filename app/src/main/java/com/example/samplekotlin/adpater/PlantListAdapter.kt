@@ -13,14 +13,14 @@ import com.example.samplekotlin.vo.Plant
 
 class PlantListAdapter (private val data: List<Plant>, private val context: Context) : RecyclerView.Adapter<PlantListAdapter.ViewHolder>(){
 
-    private  lateinit var mListener : OnItemClickListener
+    private  lateinit var listener : OnItemClickListener
 
     public interface OnItemClickListener{
         fun onItemClick(v : View, position : Int)
     }
 
     public fun setOnItemClickListener(onItemClickListener : OnItemClickListener){
-        mListener = onItemClickListener
+        listener = onItemClickListener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -57,8 +57,8 @@ class PlantListAdapter (private val data: List<Plant>, private val context: Cont
 
         init {
             itemView.setOnClickListener{
-                if(mListener != null){
-                    mListener.onItemClick(view, adapterPosition)
+                if(listener != null){
+                    listener.onItemClick(view, adapterPosition)
                 }
             }
         }

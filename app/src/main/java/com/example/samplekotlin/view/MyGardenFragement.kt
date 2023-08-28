@@ -21,7 +21,6 @@ class MyGardenFragement : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_my_garden_fragement, container, false)
-        val textView = view.findViewById<TextView>(R.id.empty_text)
         val addPlant = view.findViewById<Button>(R.id.addPlantbtn)
 
         addPlant.setOnClickListener(View.OnClickListener {

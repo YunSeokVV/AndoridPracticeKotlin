@@ -9,9 +9,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.samplekotlin.BuildConfig
 import com.example.samplekotlin.R
 import com.example.samplekotlin.adpater.PlantListAdapter
+import com.example.samplekotlin.network.NetworkProvider
 import com.example.samplekotlin.network.PlantApiService
+import com.example.samplekotlin.util.LogData
 import com.example.samplekotlin.vo.Plant
 import com.example.samplekotlin.vo.URLs
 import retrofit2.Call
@@ -29,10 +32,12 @@ class PlantListFragment : Fragment() {
 
     private var filterAll = true;
 
+    private lateinit var plantApiService: PlantApiService
+
     val plantNames = arrayOf("Apple", "Avocado", "Beet", "Bougainvillea", "Cilantro", "EggPlant", "Grape", "Hibiscus", "Mango", "Orange", "Pear", "Pink & White", "Rocky Mountain", "Sunflower", "Tomato", "Watermelon", "Yulan Magnolia")
     //val plantImages = arrayOf("apple", "avocado", "beet", "bougainvillea", "cilantro", "eggplant", "grape", "hibiscus", "mango", "orange", "pear", "pink_white", "rockymountian", "sunflower", "tomato", "watermelon", "yulanmagnolia")
     // 각 꽃의 고유 아이디들(unSplash 사이트에서 확인가능! 마지막 목련은 그냥 id값으로 줬다. 구할 수 없었기 때문)
-    val plantImagesID = arrayOf("oo3kSFZ7uHk", "cueV_oTVsic", "TmjyLCUpcDY", "CdkGk6l4eCM", "FVikKhvhnKE", "8cqlBGw84oU", "vHnQqO3TT4c", "yFmwdScAUS8", "2vq33LK8bZA", "A4BBdJQu2co", "cfxnOUSLrgk", "fxbzT96KzOo", "7CHMu7uPHCQ", "2IzoIHBgYAo", "5Oi5sG6G0z8", "feJOQIBao", "pDGNBK9A0sk")
+    val plantImagesID = arrayOf("oo3kSFZ7uHk", "cueV_oTVsic", "TmjyLCUpcDY", "CdkGk6l4eCM", "FVikKhvhnKE", "8cqlBGw84oU", "vHnQqO3TT4c", "yFmwdScAUS8", "2vq33LK8bZA", "A4BBdJQu2co", "cfxnOUSLrgk", "fxbzT96KzOo", "7CHMu7uPHCQ", "2IzoIHBgYAo", "5Oi5sG6G0z8", "hUkZv0Y47Ic", "pDGNBK9A0sk")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,45 +59,39 @@ class PlantListFragment : Fragment() {
         return view
     }
 
-    fun imgURL(plnatURL : String, count : Int) {
-        val retrofit = Retrofit.Builder().baseUrl("https://api.unsplash.com/").addConverterFactory(GsonConverterFactory.create()).build()
-        val apiService : PlantApiService = retrofit.create(PlantApiService::class.java)
-        val repos : Call<URLs> = apiService.plantImage(plnatURL)
-
-        repos.enqueue(object : Callback<URLs> {
+    fun imgURL(plantURL : String, count : Int){
+        plantApiService = NetworkProvider.provideApi()
+        val result = plantApiService.plantImage(plantURL, BuildConfig.UNSPLASH_KEY)
+        result.enqueue(object : Callback<URLs> {
             override fun onResponse(call: Call<URLs>, response: Response<URLs>) {
-                if(response.isSuccessful()) {
+                LogData.logData("MainActivity", response.body().toString(), "onResponse called")
+                println("onResponse")
+                println("response.body().urls ${response.body()?.urls?.get("raw")}")
 
-                    var plantVO = Plant(count.toLong(), plantNames[count], count, response.body()?.urls!!.get("raw").toString())
-                    data.add(plantVO)
+                var plantVO = Plant(count.toLong(), plantNames[count], count, response.body()?.urls?.get("raw").toString())
+                data.add(plantVO)
 
-                    if(data.size == 16){
+                if(data.size == 16){
 
-                        plantlistAdapter = PlantListAdapter(data)
-                        recyclerView.adapter = plantlistAdapter
+                    plantlistAdapter = PlantListAdapter(data)
+                    recyclerView.adapter = plantlistAdapter
 
-                        plantlistAdapter.setOnItemClickListener(object : PlantListAdapter.OnItemClickListener {
-                            override fun onItemClick(data : Plant) {
-                                val intent : Intent = Intent(context, PlantDetailActivity::class.java)
-//                                intent.putExtra("plantName", data.get(position).name)
-//                                intent.putExtra("imgURL", data.get(position).imageResource)
-//                                intent.putExtra("wateringNeeds", data.get(position).waterPeriod)
-                                //intent.putExtra("plantObject", data.get(position))
-                                intent.putExtra("plantObject", data)
-                                startActivity(intent)
-                            }
-                        })
-                    }
-
-                } else { // code == 400
-
+                    plantlistAdapter.setOnItemClickListener(object : PlantListAdapter.OnItemClickListener {
+                        override fun onItemClick(data : Plant) {
+                            val intent : Intent = Intent(context, PlantDetailActivity::class.java)
+                            intent.putExtra("plantObject", data)
+                            startActivity(intent)
+                        }
+                    })
                 }
 
             }
 
             override fun onFailure(call: Call<URLs>, t: Throwable) {
-
+                LogData.logData("MainActivity", t.stackTraceToString(), "OnFailure called")
+                println("onFailure")
             }
+
         })
     }
 

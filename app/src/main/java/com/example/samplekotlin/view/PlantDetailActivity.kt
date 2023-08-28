@@ -8,8 +8,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.samplekotlin.R
-import com.example.samplekotlin.database.PlantDao
-import com.example.samplekotlin.network.SearchPlantImgURL
 import com.example.samplekotlin.vo.Plant
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -45,8 +43,7 @@ class PlantDetailActivity : AppCompatActivity() {
         addBtn.setImageResource(R.drawable.baseline_add_24)
 
         addBtn.setOnClickListener(View.OnClickListener {
-            //val plant : Plant()
-            //var plantVO = Plant(count.toLong(), plantNames[count], count, response.body()?.urls!!.get("raw").toString())
+            // 자신이 좋아하는 식물목록에 추가하면 DB에 저장하게끔 동작한다. main스레드에서 DB관련 코드를 적용하면 안되기 때문에 executor를 사용했다.
             executor.execute {
 
             }

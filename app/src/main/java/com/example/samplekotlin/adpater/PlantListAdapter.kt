@@ -14,7 +14,7 @@ import com.example.samplekotlin.vo.Plant
 class PlantListAdapter (private val data: List<Plant>) : RecyclerView.Adapter<PlantListAdapter.ViewHolder>(){
 
     private  lateinit var listener : OnItemClickListener
-
+    //test
     public interface OnItemClickListener{
         fun onItemClick(plant : Plant)
     }

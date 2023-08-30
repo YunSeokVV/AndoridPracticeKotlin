@@ -14,25 +14,26 @@ import com.example.samplekotlin.R
 import com.example.samplekotlin.adpater.PlantListAdapter
 import com.example.samplekotlin.network.NetworkProvider
 import com.example.samplekotlin.network.PlantApiService
-import com.example.samplekotlin.util.LogData
 import com.example.samplekotlin.vo.Plant
 import com.example.samplekotlin.vo.URLs
+import com.orhanobut.logger.Logger
+
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class PlantListFragment : Fragment() {
-    private lateinit var plantlistAdapter : PlantListAdapter
-    private lateinit var recyclerView: RecyclerView
+    private val plantlistAdapter : PlantListAdapter by lazy{
+        PlantListAdapter(data)
+    }
 
-    private var data = mutableListOf<Plant>()
-    private var hidePlants = mutableListOf<Plant>()
+    private val data = mutableListOf<Plant>()
+    private val hidePlants = mutableListOf<Plant>()
 
     private var filterAll = true;
 
-    private lateinit var plantApiService: PlantApiService
+    //private lateinit var plantApiService: PlantApiService
+    private val plantApiService : PlantApiService = NetworkProvider.provideApi()
 
     val plantNames = arrayOf("Apple", "Avocado", "Beet", "Bougainvillea", "Cilantro", "EggPlant", "Grape", "Hibiscus", "Mango", "Orange", "Pear", "Pink & White", "Rocky Mountain", "Sunflower", "Tomato", "Watermelon", "Yulan Magnolia")
     //val plantImages = arrayOf("apple", "avocado", "beet", "bougainvillea", "cilantro", "eggplant", "grape", "hibiscus", "mango", "orange", "pear", "pink_white", "rockymountian", "sunflower", "tomato", "watermelon", "yulanmagnolia")
@@ -47,10 +48,10 @@ class PlantListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_plant_list, container,false)
 
-        recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+        val recyclerView : RecyclerView = view.findViewById<RecyclerView>(R.id.plantListrecyclerView)
 
         for(i : Int in 0..16){
-            imgURL(plantImagesID[i], i)
+            imgURL(plantImagesID[i], i, recyclerView)
         }
 
         // 자바에서 레이아웃 매너저를 설정하는 방식과 다르다.
@@ -59,21 +60,19 @@ class PlantListFragment : Fragment() {
         return view
     }
 
-    fun imgURL(plantURL : String, count : Int){
-        plantApiService = NetworkProvider.provideApi()
+    fun imgURL(plantURL : String, count : Int, recyclerVeiw : RecyclerView){
+        //plantApiService = NetworkProvider.provideApi()
         val result = plantApiService.plantImage(plantURL, BuildConfig.UNSPLASH_KEY)
         result.enqueue(object : Callback<URLs> {
             override fun onResponse(call: Call<URLs>, response: Response<URLs>) {
-                LogData.logData("MainActivity", response.body().toString(), "onResponse called")
-                println("onResponse")
-                println("response.body().urls ${response.body()?.urls?.get("raw")}")
+                Logger.v("response.body().urls ${response.body()?.urls?.get("raw")}")
 
                 var plantVO = Plant(count.toLong(), plantNames[count], count, response.body()?.urls?.get("raw").toString())
                 data.add(plantVO)
 
                 if(data.size == 16){
-
-                    plantlistAdapter = PlantListAdapter(data)
+                    //plantlistAdapter = PlantListAdapter(data)
+                    val recyclerView = recyclerVeiw
                     recyclerView.adapter = plantlistAdapter
 
                     plantlistAdapter.setOnItemClickListener(object : PlantListAdapter.OnItemClickListener {
@@ -88,8 +87,7 @@ class PlantListFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<URLs>, t: Throwable) {
-                LogData.logData("MainActivity", t.stackTraceToString(), "OnFailure called")
-                println("onFailure")
+                Logger.e("onFailure called ${t.stackTraceToString()}")
             }
 
         })

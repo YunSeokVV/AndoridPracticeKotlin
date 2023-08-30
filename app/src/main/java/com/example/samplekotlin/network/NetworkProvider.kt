@@ -5,7 +5,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 
 object NetworkProvider {
-
     fun provideApi(): PlantApiService{
         return Retrofit.Builder()
             .baseUrl("https://api.unsplash.com/photos/")
@@ -15,6 +14,5 @@ object NetworkProvider {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(PlantApiService::class.java)
-
     }
 }

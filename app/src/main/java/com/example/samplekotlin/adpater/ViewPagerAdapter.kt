@@ -8,13 +8,13 @@ import com.example.samplekotlin.view.PlantListFragment
 import java.lang.IllegalArgumentException
 
 class ViewPagerAdapter(fragmentActivity: AppCompatActivity) :
-    FragmentStateAdapter(fragmentActivity){
+    FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
-        return when(position){
-            0-> MyGardenFragement()
-            1-> PlantListFragment()
+        return when (position) {
+            0 -> MyGardenFragement()
+            1 -> PlantListFragment()
             else -> throw IllegalArgumentException("Invalid position")
         }
     }

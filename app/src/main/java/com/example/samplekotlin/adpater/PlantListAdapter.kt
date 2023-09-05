@@ -10,24 +10,27 @@ import com.bumptech.glide.Glide
 import com.example.samplekotlin.R
 import com.example.samplekotlin.vo.Plant
 
-class PlantListAdapter (private val data: List<Plant>) : RecyclerView.Adapter<PlantListAdapter.ViewHolder>(){
+class PlantListAdapter(private val data: MutableList<Plant>) :
+    RecyclerView.Adapter<PlantListAdapter.ViewHolder>() {
+    //todo: by lazy를 사용해서 늦은 초기화를 하고 싶었는데 어떻게 해야할지 도저히 떠오르지가 않는다.
+    private lateinit var listener: OnItemClickListener
 
-    private  lateinit var listener : OnItemClickListener
-    interface OnItemClickListener{
-        fun onItemClick(plant : Plant)
+    fun setClickListener(listener: OnItemClickListener) {
+        this.listener = listener
     }
 
-    fun setOnItemClickListener(onItemClickListener : OnItemClickListener){
-        listener = onItemClickListener
+    interface OnItemClickListener {
+        fun onItemClick(plant: Plant)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         LayoutInflater.from(parent.context)
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.plant_item_list,parent,false)
+        val itemView =
+            LayoutInflater.from(parent.context).inflate(R.layout.plant_item_list, parent, false)
         return ViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int){
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.bind(data[position])
     }
@@ -40,7 +43,7 @@ class PlantListAdapter (private val data: List<Plant>) : RecyclerView.Adapter<Pl
         val plantName: TextView = itemView.findViewById(R.id.plantName)
         val plantImage: ImageView = itemView.findViewById<ImageView>(R.id.palntImage)
 
-        fun bind(item : Plant){
+        fun bind(item: Plant) {
             plantName.text = item.name
             Glide.with(itemView.context).load(item.imageResource).into(plantImage)
             // 이미지뷰의 모서리를 약간 둥글게 만든다.
@@ -48,7 +51,7 @@ class PlantListAdapter (private val data: List<Plant>) : RecyclerView.Adapter<Pl
         }
 
         init {
-            itemView.setOnClickListener{
+            itemView.setOnClickListener {
                 listener.onItemClick(data.get(adapterPosition))
             }
         }

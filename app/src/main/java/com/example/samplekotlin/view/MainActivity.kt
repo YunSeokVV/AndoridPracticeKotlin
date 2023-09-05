@@ -1,27 +1,31 @@
 package com.example.samplekotlin.adpater.view
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.samplekotlin.R
 import com.example.samplekotlin.adpater.ViewPagerAdapter
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.Logger
+
 
 class MainActivity : AppCompatActivity() {
-    var filterVisible: Boolean = false
+    private var filterVisible: Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.app_toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+        Logger.addLogAdapter(AndroidLogAdapter())
+
+        Logger.v("Test log here")
 
         val tableLayout: TabLayout = findViewById<TabLayout>(R.id.tabLayout)
         val viewPager2: ViewPager2 = findViewById(R.id.viewPager2)

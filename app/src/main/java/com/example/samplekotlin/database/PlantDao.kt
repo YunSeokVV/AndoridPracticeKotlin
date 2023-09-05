@@ -8,8 +8,8 @@ import com.example.samplekotlin.vo.Plant
 @Dao
 interface PlantDao {
     @Query("SELECT * FROM Plant")
-    fun getAll():List<Plant>
+    fun getAll(): List<Plant>
 
     @Insert
-    fun insertPlant(plant : Plant)
+    fun insertPlant(plant: Plant)
 }

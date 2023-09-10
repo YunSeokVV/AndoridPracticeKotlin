@@ -2,12 +2,11 @@ package com.example.samplekotlin.util
 
 import java.util.concurrent.Executors
 
-class SingleExecutor {
+class SingleExecute : ExecutorInterface {
     private val executor = Executors.newSingleThreadExecutor()
-    fun executeTask(task: () -> Unit) {
+    override fun executeApi(task: () -> Unit) {
         executor.execute {
             task.invoke()
-
         }
     }
 }

@@ -10,8 +10,7 @@ import com.bumptech.glide.Glide
 import com.example.samplekotlin.R
 import com.example.samplekotlin.vo.Plant
 
-class PlantListAdapter(private val data: MutableList<Plant>) :
-    RecyclerView.Adapter<PlantListAdapter.ViewHolder>() {
+class PlantListAdapter(private val data: MutableList<Plant>) : RecyclerView.Adapter<PlantListAdapter.ViewHolder>() {
     //todo: by lazy를 사용해서 늦은 초기화를 하고 싶었는데 어떻게 해야할지 도저히 떠오르지가 않는다.
     private lateinit var listener: OnItemClickListener
 

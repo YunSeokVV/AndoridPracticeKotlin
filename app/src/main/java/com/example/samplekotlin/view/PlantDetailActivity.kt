@@ -12,8 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.samplekotlin.R
 import com.example.samplekotlin.database.PlantDatabase
+import com.example.samplekotlin.util.CompanionUtil
 import com.example.samplekotlin.util.SingleExecutor
 import com.example.samplekotlin.util.Util
+import com.example.samplekotlin.util.makeSingletonToastMessage
 import com.example.samplekotlin.vo.Plant
 import com.orhanobut.logger.Logger
 
@@ -65,14 +67,29 @@ class PlantDetailActivity : AppCompatActivity() {
                 val dbInstance = PlantDatabase.getInstance(baseContext)
                 dbInstance!!.plantDao().insertPlant(plant)
             }
+
+            // 기존에 만들었던 방법
             val toast = Util(baseContext)
             toast.makeToastMessage(resources.getString(R.string.add_garden))
+
+
+            // obj 예약어를 사용해서 싱글톤 구현
+            makeSingletonToastMessage.makeToastMeessage(baseContext, resources.getString(R.string.add_garden))
+
+            // 아래 두개는 companion obj 예약어를 사용해서 싱글톤 구현
+            //CompanionUtil.makeToastMessage(baseContext, "test toast2")
+            CompanionUtil.getInstance().makeToastMessage(baseContext, resources.getString(R.string.add_garden))
+
+
+
             addBtn.visibility = View.GONE
         })
 
         backBtn.setOnClickListener(View.OnClickListener() {
             val resultIntent = Intent()
             resultIntent.putExtra("likedPlant", plant)
+            resultIntent.putExtra("name","jys")
+            resultIntent.putExtra("age","27")
             setResult(RESULT_OK, resultIntent)
             finish()
         })

@@ -32,8 +32,6 @@ class PlantListFragment : Fragment() {
             }
         })
     }
-
-
     private val data = mutableListOf<Plant>()
 
     private val plantlistAdapter: PlantListAdapter by lazy {
@@ -45,26 +43,6 @@ class PlantListFragment : Fragment() {
 
     //private lateinit var plantApiService: PlantApiService
     private val plantApiService: PlantApiService = NetworkProvider.provideApi()
-
-    val plantNames = arrayOf(
-        "Apple",
-        "Avocado",
-        "Beet",
-        "Bougainvillea",
-        "Cilantro",
-        "EggPlant",
-        "Grape",
-        "Hibiscus",
-        "Mango",
-        "Orange",
-        "Pear",
-        "Pink & White",
-        "Rocky Mountain",
-        "Sunflower",
-        "Tomato",
-        "Watermelon",
-        "Yulan Magnolia"
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,10 +58,10 @@ class PlantListFragment : Fragment() {
 
         val recyclerView: RecyclerView = view.findViewById<RecyclerView>(R.id.plantListrecyclerView)
 
-        for (i: Int in 0..16) {
-            imgURL(plantNames[i], i, recyclerView)
-        }
-
+//        for (i: Int in 0..16) {
+//            imgURL(plantNames[i], i, recyclerView)
+//        }
+        imgURL("Apple", recyclerView)
 
         // 자바에서 레이아웃 매너저를 설정하는 방식과 다르다.
         recyclerView.layoutManager = GridLayoutManager(context, 2)
@@ -91,7 +69,7 @@ class PlantListFragment : Fragment() {
         return view
     }
 
-    fun imgURL(plantURL: String, count: Int, recyclerVeiw: RecyclerView) {
+    fun imgURL(plantURL: String, recyclerVeiw: RecyclerView) {
         //plantApiService = NetworkProvider.provideApi()
         val result = plantApiService.plantImage(plantURL, BuildConfig.UNSPLASH_KEY)
         Logger.v("result ${result.request().url().toString()}")
@@ -100,31 +78,19 @@ class PlantListFragment : Fragment() {
                 call: Call<UnsplashResults>,
                 response: Response<UnsplashResults>
             ) {
-                Logger.v("count $count")
-                //Logger.v("response.body() ${response.body()?.results?.get(count)?.urls}")
-                println(count.toLong())
-                println(plantNames[count])
-
-                Logger.v("result {${response.body()?.results?.size}")
-                //Error here!! todo : 왜 count가 10맘ㄴ되면 앱이 죽지?
-                Logger.v("Check " + response.body()?.results?.get(0)?.urls?.get("raw").toString())
-                var plantVO = Plant(
-                    count.toLong(),
-                    plantNames[count],
-                    count,
-                    response.body()?.results?.get(0)?.urls?.get("raw").toString()
-                )
-                data.add(plantVO)
-
-                if (data.size == 16) {
-                    //plantlistAdapter.submitList(data)
-                    //listener
-                    plantlistAdapter.setClickListener(listener)
-                    val recyclerView = recyclerVeiw
-                    recyclerView.adapter = plantlistAdapter
-
+                for (i: Int in 0..9) {
+                    var plantVO = Plant(
+                        i.toLong(),
+                        "Apple",
+                        i,
+                        response.body()?.results?.get(i)?.urls?.get("raw").toString()
+                    )
+                    data.add(plantVO)
                 }
 
+                plantlistAdapter.setClickListener(listener)
+                val recyclerView = recyclerVeiw
+                recyclerView.adapter = plantlistAdapter
             }
 
             override fun onFailure(call: Call<UnsplashResults>, t: Throwable) {

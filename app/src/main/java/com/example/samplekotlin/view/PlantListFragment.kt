@@ -1,26 +1,33 @@
 package com.example.samplekotlin.view
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.samplekotlin.BuildConfig
 import com.example.samplekotlin.R
 import com.example.samplekotlin.adpater.PlantListAdapter
+import com.example.samplekotlin.adpater.view.MainActivity
 import com.example.samplekotlin.network.NetworkProvider
 import com.example.samplekotlin.network.PlantApiService
-import com.example.samplekotlin.vo.Plant
-import com.example.samplekotlin.vo.UnsplashResults
+import com.example.samplekotlin.util.SendPlantListener
+import com.example.samplekotlin.model.Plant
+import com.example.samplekotlin.model.UnsplashResults
 import com.orhanobut.logger.Logger
-
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 
 class PlantListFragment : Fragment() {
     val listener by lazy {
@@ -28,10 +35,16 @@ class PlantListFragment : Fragment() {
             override fun onItemClick(data: Plant) {
                 val intent: Intent = Intent(context, PlantDetailActivity::class.java)
                 intent.putExtra("plantObject", data)
-                startActivity(intent)
+                intent.putExtra("likedData", ArrayList((activity as MainActivity).getLikedPlants()))
+
+                Logger.v((activity as MainActivity).getLikedPlants().toString())
+//                startActivity(intent)
+                resultLauncher.launch(intent)
             }
         })
     }
+
+
     private val data = mutableListOf<Plant>()
 
     private val plantlistAdapter: PlantListAdapter by lazy {
@@ -44,6 +57,46 @@ class PlantListFragment : Fragment() {
     //private lateinit var plantApiService: PlantApiService
     private val plantApiService: PlantApiService = NetworkProvider.provideApi()
 
+    lateinit var sendPlantListener: SendPlantListener
+
+    private val resultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        // 서브 액티비티로부터 돌아올 때의 결과 값을 받아 올 수 있는 구문
+        if (result.resultCode == Activity.RESULT_OK) {
+            Logger.v("result ok")
+            //val plant = result.data?.getStringExtra("likedPlant") as Plant
+            //val plant = result.data?.getSerializableExtra("likedPlant") as Plant
+
+            lateinit var plant: Plant
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                plant = result.data?.getSerializableExtra("likedPlant", Plant::class.java)!!
+            } else {
+                plant = (result.data?.getSerializableExtra("likedPlant") as Plant?)!!
+            }
+
+            sendPlantListener.sendMessage(plant)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Logger.v("onDestroy called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Logger.v("onStop called")
+
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        sendPlantListener = context as SendPlantListener
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -55,41 +108,30 @@ class PlantListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_plant_list, container, false)
-
-        val recyclerView: RecyclerView = view.findViewById<RecyclerView>(R.id.plantListrecyclerView)
-
-//        for (i: Int in 0..16) {
-//            imgURL(plantNames[i], i, recyclerView)
-//        }
-        imgURL("Apple", recyclerView)
-
+        val recyclerView = view.findViewById<RecyclerView>(R.id.plantListrecyclerView)
         // 자바에서 레이아웃 매너저를 설정하는 방식과 다르다.
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        return view
-    }
-
-    fun imgURL(plantURL: String, recyclerVeiw: RecyclerView) {
-        //plantApiService = NetworkProvider.provideApi()
-        val result = plantApiService.plantImage(plantURL, BuildConfig.UNSPLASH_KEY)
+        val result = plantApiService.plantImage("Apple", BuildConfig.UNSPLASH_KEY)
         Logger.v("result ${result.request().url().toString()}")
         result.enqueue(object : Callback<UnsplashResults> {
             override fun onResponse(
                 call: Call<UnsplashResults>,
                 response: Response<UnsplashResults>
             ) {
-                for (i: Int in 0..9) {
+
+                val resultList = response.body()?.results
+                resultList?.forEachIndexed { index, element ->
                     var plantVO = Plant(
-                        i.toLong(),
+                        index.toLong(),
                         "Apple",
-                        i,
-                        response.body()?.results?.get(i)?.urls?.get("raw").toString()
+                        index,
+                        response.body()?.results?.get(index)?.urls?.get("raw").toString()
                     )
                     data.add(plantVO)
                 }
 
                 plantlistAdapter.setClickListener(listener)
-                val recyclerView = recyclerVeiw
                 recyclerView.adapter = plantlistAdapter
             }
 
@@ -98,6 +140,10 @@ class PlantListFragment : Fragment() {
             }
 
         })
+
+
+
+        return view
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

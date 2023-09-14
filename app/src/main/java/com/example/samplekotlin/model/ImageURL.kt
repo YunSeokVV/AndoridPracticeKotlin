@@ -1,6 +1,5 @@
-package com.example.samplekotlin.vo
+package com.example.samplekotlin.model
 
-import com.google.gson.annotations.SerializedName
 import com.google.gson.internal.LinkedTreeMap
 
 data class ImageURL(

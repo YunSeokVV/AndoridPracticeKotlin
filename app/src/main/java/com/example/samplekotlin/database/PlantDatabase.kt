@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.samplekotlin.vo.Plant
+import com.example.samplekotlin.model.Plant
 import com.orhanobut.logger.Logger
 
 //AppDatabase 클래스다.

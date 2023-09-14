@@ -1,6 +1,6 @@
 package com.example.samplekotlin.network
 
-import com.example.samplekotlin.vo.UnsplashResults
+import com.example.samplekotlin.model.UnsplashResults
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Headers

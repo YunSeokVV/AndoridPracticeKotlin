@@ -7,7 +7,6 @@ class SingleExecutor {
     fun executeTask(task: () -> Unit) {
         executor.execute {
             task.invoke()
-
         }
     }
 }

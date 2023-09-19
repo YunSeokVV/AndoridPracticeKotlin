@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.samplekotlin.R
 import com.example.samplekotlin.model.Plant
+import com.orhanobut.logger.Logger
 
-class PlantListAdapter(private val data: MutableList<Plant>) :
+class PlantListAdapter(private var data: List<Plant>) :
     RecyclerView.Adapter<PlantListAdapter.ViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
@@ -36,6 +37,12 @@ class PlantListAdapter(private val data: MutableList<Plant>) :
 
     override fun getItemCount(): Int {
         return data.size
+    }
+
+    fun notifyItemChanged(plants: List<Plant>) {
+        this.data = plants as MutableList<Plant>
+        notifyDataSetChanged()
+        //notifyItemInserted(data.size)
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

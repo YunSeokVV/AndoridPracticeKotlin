@@ -74,6 +74,7 @@ class MainActivity : SendPlantListener, AppCompatActivity() {
         return false
     }
 
+
     override fun sendMessage(plant: Plant) {
         val fragment = viewPagerAdapter.myGardenFragement
         fragment.addLikedItem(plant)

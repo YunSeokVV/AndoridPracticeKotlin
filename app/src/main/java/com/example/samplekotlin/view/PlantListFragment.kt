@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.samplekotlin.BuildConfig
@@ -23,6 +24,7 @@ import com.example.samplekotlin.network.PlantApiService
 import com.example.samplekotlin.util.SendPlantListener
 import com.example.samplekotlin.model.Plant
 import com.example.samplekotlin.model.UnsplashResults
+import com.example.samplekotlin.viewmodel.PlantDetailFragmentViewModel
 import com.orhanobut.logger.Logger
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,13 +35,18 @@ class PlantListFragment : Fragment() {
     val listener by lazy {
         (object : PlantListAdapter.OnItemClickListener {
             override fun onItemClick(data: Plant) {
-                val intent: Intent = Intent(context, PlantDetailActivity::class.java)
-                intent.putExtra("plantObject", data)
-                intent.putExtra("likedData", ArrayList((activity as MainActivity).getLikedPlants()))
 
-                Logger.v((activity as MainActivity).getLikedPlants().toString())
-//                startActivity(intent)
-                resultLauncher.launch(intent)
+                val viewModel: PlantDetailFragmentViewModel =
+                    ViewModelProvider(requireActivity()).get(PlantDetailFragmentViewModel::class.java)
+                viewModel.setPlant(data)
+                viewModel.setLikeData(ArrayList((activity as MainActivity).getLikedPlants()))
+
+                val transaction = parentFragmentManager.beginTransaction()
+                val plantDetailFragment = PlantDetailFragment()
+                transaction.replace(R.id.fragmentContainer, plantDetailFragment)
+
+                transaction.commit()
+
             }
         })
     }
@@ -58,27 +65,6 @@ class PlantListFragment : Fragment() {
     private val plantApiService: PlantApiService = NetworkProvider.provideApi()
 
     lateinit var sendPlantListener: SendPlantListener
-
-    private val resultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        // 서브 액티비티로부터 돌아올 때의 결과 값을 받아 올 수 있는 구문
-        if (result.resultCode == Activity.RESULT_OK) {
-            Logger.v("result ok")
-            //val plant = result.data?.getStringExtra("likedPlant") as Plant
-            //val plant = result.data?.getSerializableExtra("likedPlant") as Plant
-
-            lateinit var plant: Plant
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                plant = result.data?.getSerializableExtra("likedPlant", Plant::class.java)!!
-            } else {
-                plant = (result.data?.getSerializableExtra("likedPlant") as Plant?)!!
-            }
-
-            sendPlantListener.sendMessage(plant)
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()

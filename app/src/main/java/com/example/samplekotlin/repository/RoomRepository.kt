@@ -6,11 +6,11 @@ import com.example.samplekotlin.model.Plant
 import com.orhanobut.logger.Logger
 
 class RoomRepository(private val plantDao: PlantDao) {
-    val allPlants: LiveData<List<Plant>> = plantDao.getAll()
+    //val allPlants: List<Plant> = plantDao.getAll()
 
-    fun insertPlant(plant: Plant) {
-        plantDao.insertPlant(plant)
-    }
+//    suspend fun insertPlant(plant: Plant) {
+//        plantDao.insertPlant(plant)
+//    }
 
     //Dao 를 사용해서 DB의 데이터를 전부 LiveData형태로 갖고온다.
 

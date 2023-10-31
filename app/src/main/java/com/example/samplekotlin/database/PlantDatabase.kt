@@ -22,7 +22,6 @@ abstract class PlantDatabase : RoomDatabase() {
                     context.applicationContext, PlantDatabase::class.java, "plant_database"
                 ).build()
 
-                Logger.v("instance " + instance.hashCode())
                 return instance
             }
         }

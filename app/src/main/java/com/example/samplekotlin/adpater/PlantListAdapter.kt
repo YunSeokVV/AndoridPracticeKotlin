@@ -11,8 +11,7 @@ import com.example.samplekotlin.R
 import com.example.samplekotlin.model.Plant
 import com.orhanobut.logger.Logger
 
-class PlantListAdapter(private var data: List<Plant>) :
-    RecyclerView.Adapter<PlantListAdapter.ViewHolder>() {
+class PlantListAdapter(private var data: List<Plant>) : RecyclerView.Adapter<PlantListAdapter.ViewHolder>() {
     private lateinit var listener: OnItemClickListener
 
     fun setClickListener(listener: OnItemClickListener) {

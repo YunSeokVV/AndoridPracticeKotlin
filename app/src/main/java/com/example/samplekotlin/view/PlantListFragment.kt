@@ -11,71 +11,74 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.samplekotlin.BuildConfig
 import com.example.samplekotlin.R
 import com.example.samplekotlin.adpater.PlantListAdapter
-import com.example.samplekotlin.adpater.view.MainActivity
+import com.example.samplekotlin.dataSource.local.GetPlantDataSourceImpl
+import com.example.samplekotlin.dataSource.remote.PlantRemoteDataSource
+import com.example.samplekotlin.database.PlantDatabase
 import com.example.samplekotlin.network.NetworkProvider
-import com.example.samplekotlin.network.PlantApiService
 import com.example.samplekotlin.util.SendPlantListener
 import com.example.samplekotlin.model.Plant
-import com.example.samplekotlin.model.UnsplashResults
-import com.example.samplekotlin.viewmodel.PlantDetailFragmentViewModel
+import com.example.samplekotlin.repository.GetLocalPlantRepositoryImpl
+import com.example.samplekotlin.repository.GetRemotePlantRepositoryImpl
+import com.example.samplekotlin.useCase.GetLocalPlantUseCaseImpl
+import com.example.samplekotlin.useCase.GetRemotePlantUseCaseImpl
+import com.example.samplekotlin.viewmodel.MainActivityViewModel
+import com.example.samplekotlin.viewmodel.PlantListFragmentViewModel
 import com.orhanobut.logger.Logger
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 
 class PlantListFragment : Fragment() {
     val listener by lazy {
         (object : PlantListAdapter.OnItemClickListener {
             override fun onItemClick(data: Plant) {
-
-                val viewModel: PlantDetailFragmentViewModel =
-                    ViewModelProvider(requireActivity()).get(PlantDetailFragmentViewModel::class.java)
-                viewModel.setPlant(data)
-                viewModel.setLikeData(ArrayList((activity as MainActivity).getLikedPlants()))
-
+                val bundle = Bundle()
+                bundle.putSerializable("plant", data)
                 val transaction = parentFragmentManager.beginTransaction()
                 val plantDetailFragment = PlantDetailFragment()
+                plantDetailFragment.arguments = bundle
                 transaction.replace(R.id.fragmentContainer, plantDetailFragment)
-
                 transaction.commit()
 
             }
         })
     }
 
+    private val plantListViewModel: PlantListFragmentViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                PlantListFragmentViewModel(
+                    GetRemotePlantUseCaseImpl(
+                        GetRemotePlantRepositoryImpl(
+                            PlantRemoteDataSource(NetworkProvider.provideApi())
+                        )
+                    )
+                )
+            }
+        }
+    }
 
-    private val data = mutableListOf<Plant>()
+    private val plantsData = mutableListOf<Plant>()
 
     private val plantlistAdapter: PlantListAdapter by lazy {
-        PlantListAdapter(data)
+        PlantListAdapter(plantsData)
     }
     private val hidePlants = mutableListOf<Plant>()
 
     private var filterAll = true;
 
-    //private lateinit var plantApiService: PlantApiService
-    private val plantApiService: PlantApiService = NetworkProvider.provideApi()
-
     lateinit var sendPlantListener: SendPlantListener
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Logger.v("onDestroy called")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Logger.v("onStop called")
-
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -98,35 +101,22 @@ class PlantListFragment : Fragment() {
         // 자바에서 레이아웃 매너저를 설정하는 방식과 다르다.
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        val result = plantApiService.plantImage("Apple", BuildConfig.UNSPLASH_KEY)
-        Logger.v("result ${result.request().url().toString()}")
-        result.enqueue(object : Callback<UnsplashResults> {
-            override fun onResponse(
-                call: Call<UnsplashResults>,
-                response: Response<UnsplashResults>
-            ) {
-
-                val resultList = response.body()?.results
-                resultList?.forEachIndexed { index, element ->
-                    var plantVO = Plant(
-                        index.toLong(),
-                        "Apple",
-                        index,
-                        response.body()?.results?.get(index)?.urls?.get("raw").toString()
-                    )
-                    data.add(plantVO)
-                }
-
-                plantlistAdapter.setClickListener(listener)
-                recyclerView.adapter = plantlistAdapter
+        plantListViewModel.getPlants().observe(requireActivity(), Observer { data ->
+            val resultList = data.body()?.results
+            resultList?.forEachIndexed { index, element ->
+                var plantVO = Plant(
+                    index.toLong(),
+                    "Apple",
+                    index,
+                    // 결국 아래 값은 이미지의 url 값이다.
+                    data.body()?.results?.get(index)?.urls?.get("raw").toString()
+                )
+                plantsData.add(plantVO)
             }
 
-            override fun onFailure(call: Call<UnsplashResults>, t: Throwable) {
-                Logger.e("onFailure called ${t.stackTraceToString()}")
-            }
-
+            plantlistAdapter.setClickListener(listener)
+            recyclerView.adapter = plantlistAdapter
         })
-
 
 
         return view
@@ -148,18 +138,18 @@ class PlantListFragment : Fragment() {
         // 모든 식물 목록을 보여준다.
         if (filter) {
             for (i: Int in 0..11) {
-                data.add(hidePlants.get(i))
+                plantsData.add(hidePlants.get(i))
             }
             hidePlants.clear()
         }
         // 필터링된 4개의 식물만 보여준다.
         else {
-            for (i in data.size - 1 downTo 4) {
-                hidePlants.add(data.get(i))
+            for (i in plantsData.size - 1 downTo 4) {
+                hidePlants.add(plantsData.get(i))
             }
 
-            for (i in data.size - 1 downTo 4) {
-                data.removeAt(i)
+            for (i in plantsData.size - 1 downTo 4) {
+                plantsData.removeAt(i)
             }
         }
 

@@ -16,7 +16,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "UNSPLASH_KEY",
+        buildConfigField(
+            "String", "UNSPLASH_KEY",
             (project.properties["UNSPLASH_KEY"] ?: "\"NOT_FOUND\"").toString()
         )
     }
@@ -40,6 +41,14 @@ android {
 }
 
 dependencies {
+    // by viewModels 를 사용하기 위해 추가한 라이브러리
+    implementation("androidx.activity:activity-ktx:1.5.0")
+    // by viewModels 를 프레그먼트에서 사용하기 위해 추가함
+    implementation("androidx.fragment:fragment-ktx:1.6.1")
+
+    //viewModelScope를 사용하기 위해서 추가했다.
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+
     implementation("com.github.bumptech.glide:glide:4.11.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     // retrofit 통신을 사용해서 데이터를 받아올때 json 형태가 아닌 문자열이나 숫자로 받아올때 scalars 라이브러리가 필요하다
@@ -57,10 +66,11 @@ dependencies {
     // 로그를 보기 편하게 해주는 라이브러리
     implementation("com.orhanobut:logger:2.2.0")
 
+    implementation("androidx.room:room-ktx:2.5.0")
 
-    implementation ("androidx.room:room-runtime:2.5.2")
-    kapt ("androidx.room:room-compiler:2.5.2")
+    implementation("androidx.room:room-runtime:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2")
 
     // registerForActivityResult를 쓰기위한 라이브러리 추가
-    implementation ("androidx.activity:activity-ktx:1.4.0")
+    implementation("androidx.activity:activity-ktx:1.4.0")
 }

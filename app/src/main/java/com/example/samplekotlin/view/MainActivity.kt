@@ -3,15 +3,24 @@ package com.example.samplekotlin.adpater.view
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.viewpager2.widget.ViewPager2
 import com.example.samplekotlin.R
 import com.example.samplekotlin.adpater.ViewPagerAdapter
+import com.example.samplekotlin.dataSource.local.GetPlantDataSourceImpl
+import com.example.samplekotlin.database.PlantDatabase
 import com.example.samplekotlin.util.SendPlantListener
 import com.example.samplekotlin.model.Plant
+import com.example.samplekotlin.repository.GetLocalPlantRepositoryImpl
+import com.example.samplekotlin.useCase.GetLocalPlantUseCaseImpl
 import com.example.samplekotlin.viewmodel.MainActivityViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -20,8 +29,25 @@ import com.orhanobut.logger.Logger
 
 
 class MainActivity : SendPlantListener, AppCompatActivity() {
-    private val mainActivityViewModel by lazy {
-        ViewModelProvider(this).get(MainActivityViewModel::class.java)
+//    private val mainActivityViewModel by lazy {
+//        ViewModelProvider(this).get(MainActivityViewModel::class.java)
+//    }
+
+
+    val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
+        viewModelFactory {
+            initializer {
+                MainActivityViewModel(
+                    GetLocalPlantUseCaseImpl(
+                        GetLocalPlantRepositoryImpl(
+                            GetPlantDataSourceImpl(
+                                PlantDatabase.getInstance(applicationContext).plantDao()
+                            )
+                        )
+                    )
+                )
+            }
+        }
     }
 
     private val viewPagerAdapter = ViewPagerAdapter(this)
@@ -77,7 +103,7 @@ class MainActivity : SendPlantListener, AppCompatActivity() {
 
     override fun sendMessage(plant: Plant) {
         val fragment = viewPagerAdapter.myGardenFragement
-        fragment.addLikedItem(plant)
+        fragment.addLikedItem()
     }
 
     fun getLikedPlants(): MutableList<Plant> {
@@ -85,3 +111,4 @@ class MainActivity : SendPlantListener, AppCompatActivity() {
     }
 
 }
+

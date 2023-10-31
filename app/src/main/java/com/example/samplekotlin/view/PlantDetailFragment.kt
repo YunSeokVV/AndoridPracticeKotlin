@@ -1,7 +1,6 @@
 package com.example.samplekotlin.view
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,24 +8,62 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.bumptech.glide.Glide
 import com.example.samplekotlin.R
+import com.example.samplekotlin.dataSource.local.GetPlantDataSourceImpl
+import com.example.samplekotlin.dataSource.local.InsertPlantDataSourceImpl
+import com.example.samplekotlin.database.PlantDatabase
 import com.example.samplekotlin.model.Plant
-import com.example.samplekotlin.util.ExecutorInterface
+import com.example.samplekotlin.repository.GetLocalPlantRepositoryImpl
+import com.example.samplekotlin.repository.InsertPlantRepositoryImpl
+import com.example.samplekotlin.useCase.GetLocalPlantUseCaseImpl
+import com.example.samplekotlin.useCase.InsertPlantUseCaseImpl
 import com.example.samplekotlin.util.Util
-import com.example.samplekotlin.viewmodel.MyGardenFragmentViewModel
-import com.example.samplekotlin.viewmodel.MyGardenFramgnetViewModelFactory
+import com.example.samplekotlin.viewmodel.MainActivityViewModel
 import com.example.samplekotlin.viewmodel.PlantDetailFragmentViewModel
 import com.orhanobut.logger.Logger
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 class PlantDetailFragment : Fragment() {
-    lateinit var plant: Plant
+    val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
+        viewModelFactory {
+            initializer {
+                MainActivityViewModel(
+                    GetLocalPlantUseCaseImpl(
+                        GetLocalPlantRepositoryImpl(
+                            GetPlantDataSourceImpl(
+                                PlantDatabase.getInstance(requireActivity().applicationContext).plantDao()
+                            )
+                        )
+                    )
+                )
+            }
+        }
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    val viewModel : PlantDetailFragmentViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                PlantDetailFragmentViewModel(
+                    InsertPlantUseCaseImpl(
+                        InsertPlantRepositoryImpl(
+                            InsertPlantDataSourceImpl(
+                                PlantDatabase.getInstance(requireContext()).plantDao()
+                            )
+                        )
+                    )
+                )
+            }
+        }
     }
 
     override fun onCreateView(
@@ -47,62 +84,31 @@ class PlantDetailFragment : Fragment() {
         val addBtn: ImageView = view.findViewById(R.id.addGardenBtn)
         addBtn.setImageResource(R.drawable.baseline_add_24)
 
-        val viewModel: PlantDetailFragmentViewModel =
-            ViewModelProvider(requireActivity()).get(PlantDetailFragmentViewModel::class.java)
-        viewModel.plant.observe(viewLifecycleOwner, Observer {
-            planttNameTextView.text = it.name
-            Glide.with(this).load(it.imageResource).into(plantImg)
-            var waterPeriod = it.waterPeriod
-            waterPeriod++
-            wateringNeedsTextView.text = "every ${waterPeriod} days"
-            plant = it
+        val bundle: Bundle = requireArguments()
+        bundle.getSerializable("plant")
+        val plant: Plant = bundle.getSerializable("plant") as Plant
+
+        mainActivityViewModel.getLocalPlant().observe(requireActivity(), Observer { data ->
+            data.forEach {
+                planttNameTextView.text = plant?.name
+                Glide.with(this).load(plant?.imageResource).into(plantImg)
+                var waterPeriod = plant?.waterPeriod
+                wateringNeedsTextView.text = "every ${waterPeriod} days"
+                addBtn.visibility = mainActivityViewModel.likedPlant(plant.imageResource)
+            }
         })
 
+        planttNameTextView.text = plant?.name
+        Glide.with(this).load(plant?.imageResource).into(plantImg)
+        var waterPeriod = plant?.waterPeriod
+        wateringNeedsTextView.text = "every ${waterPeriod} days"
+
         addBtn.setOnClickListener(View.OnClickListener {
-            // 기존에 DB에 데이터를 추가했었던 방식이다. executor 만 사용했지 람다는 적용되어있지 않다.
-//            val loadDataExecutor = SingleExecutor()
-//            loadDataExecutor.executeTask {
-//                val dbInstance = PlantDatabase.getInstance(baseContext)
-//                dbInstance!!.plantDao().insertPlant(plant)
-//            }
-
-            // 인터페이스에 디폴트 메소드를 만든다음 디폴트메소드를 구현하는 객체를 만든뒤 그 객체를 사용해서 DB 관련 동작을 수행했다.
-//            val executor : ExecutorInterface = SingleExecutorLauncher()
-//            executor.executerAsync{
-//                val dbInstance = PlantDatabase.getInstance(baseContext)
-//                dbInstance!!.plantDao().insertPlant(plant)
-//            }
-
-//            // 익명객체를 만든뒤 인터페이스의 디폴트메소드를 사용해싿.
-//            insertDb.executeAsync {
-//                val dbInstance = PlantDatabase.getInstance(baseContext)
-//                dbInstance!!.plantDao().insertPlant(plant)
-//                Logger.v("data inserted!!")
-//                if(Looper.myLooper() == Looper.getMainLooper()){
-//                    Logger.v("mainlooper")
-//                }
-//                else{
-//                    Logger.v("sublooper")
-//                }
-//            }
-
-
-            val r = Runnable {
-                val viewModelFactory =
-                    MyGardenFramgnetViewModelFactory(requireActivity().applicationContext)
-                val myGardenFragmentViewModel =
-                    ViewModelProvider(requireActivity(), viewModelFactory).get(
-                        MyGardenFragmentViewModel::class.java
-                    )
-                myGardenFragmentViewModel.addPlant(plant)
-            }
-
-            val thread = Thread(r)
-            thread.start()
-
+            viewModel.insertPlant(plant)
             Util.makeToastMessage(requireContext(), resources.getString(R.string.add_garden))
-
             addBtn.visibility = View.GONE
+
+            mainActivityViewModel.loadLocalPlant()
         })
 
 
@@ -114,7 +120,9 @@ class PlantDetailFragment : Fragment() {
 //                setResult(RESULT_OK, resultIntent)
             }
 
-            activity?.finish()
+
+            parentFragmentManager.beginTransaction().remove(this).commit()
+            parentFragmentManager.popBackStack()
         })
 
         shareBtn.setOnClickListener(View.OnClickListener {

@@ -4,13 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Room
 import com.example.samplekotlin.model.Plant
 
 @Dao
 interface PlantDao {
     @Query("SELECT * FROM Plant")
-    fun getAll(): LiveData<List<Plant>>
+    suspend fun getAll(): LiveData<List<Plant>>
 
     @Insert
-    fun insertPlant(plant: Plant)
+    suspend fun insertPlant(plant: Plant)
 }

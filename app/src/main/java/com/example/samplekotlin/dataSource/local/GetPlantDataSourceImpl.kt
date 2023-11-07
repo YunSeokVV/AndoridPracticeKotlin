@@ -5,7 +5,7 @@ import com.example.samplekotlin.database.PlantDao
 import com.example.samplekotlin.model.Plant
 
 class GetPlantDataSourceImpl(private val plantDao : PlantDao) : GetLocalPlantDataSource {
-    override suspend fun getPlant(): LiveData<List<Plant>> {
+    override fun getPlant(): LiveData<List<Plant>> {
         return plantDao.getAll()
     }
 }

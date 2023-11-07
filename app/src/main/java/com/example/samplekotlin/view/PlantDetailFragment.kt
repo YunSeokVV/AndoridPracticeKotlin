@@ -26,6 +26,7 @@ import com.example.samplekotlin.repository.GetLocalPlantRepositoryImpl
 import com.example.samplekotlin.repository.InsertPlantRepositoryImpl
 import com.example.samplekotlin.useCase.GetLocalPlantUseCaseImpl
 import com.example.samplekotlin.useCase.InsertPlantUseCaseImpl
+import com.example.samplekotlin.util.CompanionUtil
 import com.example.samplekotlin.util.Util
 import com.example.samplekotlin.viewmodel.MainActivityViewModel
 import com.example.samplekotlin.viewmodel.PlantDetailFragmentViewModel
@@ -33,15 +34,16 @@ import com.orhanobut.logger.Logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
-class PlantDetailFragment : Fragment() {
-    val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
+class PlantDetailFragment(private val plant: Plant) : Fragment() {
+    private val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
         viewModelFactory {
             initializer {
                 MainActivityViewModel(
                     GetLocalPlantUseCaseImpl(
                         GetLocalPlantRepositoryImpl(
                             GetPlantDataSourceImpl(
-                                PlantDatabase.getInstance(requireActivity().applicationContext).plantDao()
+                                PlantDatabase.getInstance(requireActivity().applicationContext)!!
+                                    .plantDao()
                             )
                         )
                     )
@@ -50,14 +52,14 @@ class PlantDetailFragment : Fragment() {
         }
     }
 
-    val viewModel : PlantDetailFragmentViewModel by viewModels {
+    private val viewModel: PlantDetailFragmentViewModel by viewModels {
         viewModelFactory {
             initializer {
                 PlantDetailFragmentViewModel(
                     InsertPlantUseCaseImpl(
                         InsertPlantRepositoryImpl(
                             InsertPlantDataSourceImpl(
-                                PlantDatabase.getInstance(requireContext()).plantDao()
+                                PlantDatabase.getInstance(requireContext())!!.plantDao()
                             )
                         )
                     )
@@ -84,42 +86,33 @@ class PlantDetailFragment : Fragment() {
         val addBtn: ImageView = view.findViewById(R.id.addGardenBtn)
         addBtn.setImageResource(R.drawable.baseline_add_24)
 
-        val bundle: Bundle = requireArguments()
-        bundle.getSerializable("plant")
-        val plant: Plant = bundle.getSerializable("plant") as Plant
+        planttNameTextView.text = plant?.name
+        Glide.with(this).load(plant?.imageResource).into(plantImg)
+        wateringNeedsTextView.text = "every ${plant?.waterPeriod.toString()} days"
 
         mainActivityViewModel.getLocalPlant().observe(requireActivity(), Observer { data ->
+            Logger.v("getLocalPlant observer called1")
             data.forEach {
-                planttNameTextView.text = plant?.name
-                Glide.with(this).load(plant?.imageResource).into(plantImg)
-                var waterPeriod = plant?.waterPeriod
-                wateringNeedsTextView.text = "every ${waterPeriod} days"
-                addBtn.visibility = mainActivityViewModel.likedPlant(plant.imageResource)
+                //addBtn.visibility = mainActivityViewModel.likedPlant(plant.imageResource,mainActivityViewModel.getLocalPlant())
+                addBtn.visibility = CompanionUtil.likedPlant(
+                    plant.imageResource,
+                    mainActivityViewModel.getLocalPlant()
+                )
             }
         })
 
         planttNameTextView.text = plant?.name
         Glide.with(this).load(plant?.imageResource).into(plantImg)
-        var waterPeriod = plant?.waterPeriod
+        val waterPeriod = plant?.waterPeriod
         wateringNeedsTextView.text = "every ${waterPeriod} days"
 
         addBtn.setOnClickListener(View.OnClickListener {
             viewModel.insertPlant(plant)
             Util.makeToastMessage(requireContext(), resources.getString(R.string.add_garden))
-            addBtn.visibility = View.GONE
-
-            mainActivityViewModel.loadLocalPlant()
         })
 
 
         backBtn.setOnClickListener(View.OnClickListener() {
-            if (addBtn.visibility == View.GONE) {
-//                val resultIntent = Intent()
-//                Logger.v("plant "+plant.imageResource)
-//                resultIntent.putExtra("likedPlant", plant)
-//                setResult(RESULT_OK, resultIntent)
-            }
-
 
             parentFragmentManager.beginTransaction().remove(this).commit()
             parentFragmentManager.popBackStack()

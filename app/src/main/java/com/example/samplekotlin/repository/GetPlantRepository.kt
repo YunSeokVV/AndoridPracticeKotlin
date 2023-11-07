@@ -14,7 +14,7 @@ interface GetRemotePlantRepository {
 }
 
 interface GetLocalPlantRepository{
-    suspend fun getPlant() : LiveData<List<Plant>>
+    fun getPlant() : LiveData<List<Plant>>
 }
 
 class GetRemotePlantRepositoryImpl(private val plantURLDataSource: PlantURLDataSource) : GetRemotePlantRepository{
@@ -25,7 +25,7 @@ class GetRemotePlantRepositoryImpl(private val plantURLDataSource: PlantURLDataS
 }
 
 class GetLocalPlantRepositoryImpl(private val plantDataSource : GetLocalPlantDataSource) : GetLocalPlantRepository{
-    override suspend fun getPlant(): LiveData<List<Plant>> {
+    override fun getPlant(): LiveData<List<Plant>> {
         return plantDataSource.getPlant()
     }
 }

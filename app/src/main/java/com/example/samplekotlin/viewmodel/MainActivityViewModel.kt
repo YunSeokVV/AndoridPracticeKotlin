@@ -16,9 +16,8 @@ import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel(private val getLocalPlantUserCase: GetLocalPlantUserCase) : ViewModel() {
-    //private var localPlant = MutableLiveData<List<Plant>>()
-    private val db = PlantDatabase.getInstance()
-    private val localPlant : LiveData<List<Plant>> = PlantDao()
+
+    lateinit var localPlant : LiveData<List<Plant>>
     private var filterVisibleLiveData = MutableLiveData<Boolean>()
 
     init{
@@ -36,23 +35,14 @@ class MainActivityViewModel(private val getLocalPlantUserCase: GetLocalPlantUser
     }
 
     fun loadLocalPlant() {
-        viewModelScope.launch() {
-            localPlant = getLocalPlantUserCase.loadPlant()
-        }
+
+        localPlant = getLocalPlantUserCase.loadPlant()
     }
 
+    @JvmName("callFromPlant")
     fun getLocalPlant() : LiveData<List<Plant>>{
         return localPlant
     }
 
-    fun likedPlant(imgURL : String) : Int{
-        var isVisible : Int = View.VISIBLE
-        localPlant.value?.forEach {
-            if(it.imageResource.equals(imgURL)){
-                isVisible = View.GONE
-            }
-        }
-        return isVisible
-    }
 
 }

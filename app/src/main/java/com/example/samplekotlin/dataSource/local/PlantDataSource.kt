@@ -8,5 +8,5 @@ interface InsertPlantDataSource {
 }
 
 interface GetLocalPlantDataSource {
-    suspend fun getPlant() : LiveData<List<Plant>>
+    fun getPlant() : LiveData<List<Plant>>
 }

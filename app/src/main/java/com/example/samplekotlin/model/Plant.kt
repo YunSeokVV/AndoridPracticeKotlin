@@ -6,11 +6,11 @@ import java.io.Serializable
 
 @Entity
 data class Plant(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
     val name: String,
     val waterPeriod: Int,
     val imageResource:
     String
-) : Serializable {}
-
+) : Serializable {
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
+}

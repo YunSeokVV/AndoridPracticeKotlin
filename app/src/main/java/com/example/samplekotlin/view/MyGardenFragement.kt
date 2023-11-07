@@ -26,14 +26,15 @@ import com.orhanobut.logger.Logger
 
 
 class MyGardenFragement : Fragment() {
-    val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
+    private val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
         viewModelFactory {
             initializer {
                 MainActivityViewModel(
                     GetLocalPlantUseCaseImpl(
                         GetLocalPlantRepositoryImpl(
                             GetPlantDataSourceImpl(
-                                PlantDatabase.getInstance(requireContext().applicationContext).plantDao()
+                                PlantDatabase.getInstance(requireContext().applicationContext)!!
+                                    .plantDao()
                             )
                         )
                     )
@@ -42,22 +43,15 @@ class MyGardenFragement : Fragment() {
         }
     }
 
-    private lateinit var recyclerView: RecyclerView
-
-    val likedData = mutableListOf<Plant>()
-
     private val plantlistAdapter: PlantListAdapter by lazy {
-        PlantListAdapter(likedData)
+        PlantListAdapter()
     }
 
-    val listener by lazy {
+    private val clickListener by lazy {
         (object : PlantListAdapter.OnItemClickListener {
             override fun onItemClick(data: Plant) {
-                val bundle = Bundle()
-                bundle.putSerializable("plant", data)
                 val transaction = parentFragmentManager.beginTransaction()
-                val plantDetailFragment = PlantDetailFragment()
-                plantDetailFragment.arguments = bundle
+                val plantDetailFragment = PlantDetailFragment(data)
                 transaction.replace(R.id.fragmentContainer, plantDetailFragment)
                 transaction.commit()
 
@@ -65,14 +59,22 @@ class MyGardenFragement : Fragment() {
         })
     }
 
+//    //todo : 클릭리스너에 대한 질문이 끝나면 이 코드를 설정하도록 하기
+//    private val longClickListener by lazy {
+//        (object : PlantListAdapter.OnItemLongClickListener {
+//            override fun onItemlongClick(plant: Plant) {
+//                //viewHolder.
+//            }
+//        })
+//    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_my_garden_fragement, container, false)
-        //val recyclerView = view.findViewById<RecyclerView>(R.id.myPlantListrecyclerView)
-        recyclerView = view.findViewById<RecyclerView>(R.id.myPlantListrecyclerView)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.myPlantListrecyclerView)
         val addPlant = view.findViewById<Button>(R.id.addPlantbtn)
         val empty_text = view.findViewById<TextView>(R.id.empty_text)
         addPlant.setOnClickListener(View.OnClickListener {
@@ -83,35 +85,22 @@ class MyGardenFragement : Fragment() {
         addPlant.visibility = View.GONE
         empty_text.visibility = View.GONE
 
-        recyclerView?.layoutManager = GridLayoutManager(context, 2)
+        recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        Logger.v(mainActivityViewModel.getLocalPlant().value.toString())
+        plantlistAdapter.setClickListener(clickListener)
+        //plantlistAdapter.setLongClickListener(longClickListener)
 
-        mainActivityViewModel.getLocalPlant().observe(requireActivity(), Observer { data ->
-            Logger.v(data.toString())
-            data.forEach {
-                likedData.add(it)
-            }
+        recyclerView.adapter = plantlistAdapter
 
-            Logger.v(likedData.toString())
+        mainActivityViewModel.getLocalPlant()
+            .observe(requireActivity(), Observer<List<Plant>> { data ->
+                Logger.v(data.toString())
+                plantlistAdapter.setData(data)
+                plantlistAdapter.notifyItemChanged()
 
-            plantlistAdapter.setClickListener(listener)
-            recyclerView?.adapter = plantlistAdapter
-
-
-            Logger.v(mainActivityViewModel.getLocalPlant().value.toString())
-        })
-
-
-        Logger.v(mainActivityViewModel.getLocalPlant().value.toString())
+            })
 
         return view
-    }
-
-    fun addLikedItem() {
-//        likedData.add(plant)
-//        Logger.v(plant.imageResource)
-        recyclerView?.adapter?.notifyItemInserted(likedData.size)
     }
 
 }

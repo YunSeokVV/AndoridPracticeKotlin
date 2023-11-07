@@ -3,6 +3,7 @@ package com.example.samplekotlin.view
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -40,20 +41,25 @@ import com.orhanobut.logger.Logger
 
 
 class PlantListFragment : Fragment() {
-    val listener by lazy {
+    private val listener by lazy {
         (object : PlantListAdapter.OnItemClickListener {
             override fun onItemClick(data: Plant) {
-                val bundle = Bundle()
-                bundle.putSerializable("plant", data)
                 val transaction = parentFragmentManager.beginTransaction()
-                val plantDetailFragment = PlantDetailFragment()
-                plantDetailFragment.arguments = bundle
+                val plantDetailFragment = PlantDetailFragment(data)
                 transaction.replace(R.id.fragmentContainer, plantDetailFragment)
                 transaction.commit()
-
             }
         })
     }
+
+//    //todo : 클릭리스너에 대한 질문이 끝나면 이 코드를 설정하도록 하기
+//    private val longClickListener by lazy {
+//        (object : PlantListAdapter.OnItemLongClickListener {
+//            override fun onItemlongClick(plant: Plant) {
+//                // holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.yellow))
+//            }
+//        })
+//    }
 
     private val plantListViewModel: PlantListFragmentViewModel by viewModels {
         viewModelFactory {
@@ -69,21 +75,8 @@ class PlantListFragment : Fragment() {
         }
     }
 
-    private val plantsData = mutableListOf<Plant>()
-
     private val plantlistAdapter: PlantListAdapter by lazy {
-        PlantListAdapter(plantsData)
-    }
-    private val hidePlants = mutableListOf<Plant>()
-
-    private var filterAll = true;
-
-    lateinit var sendPlantListener: SendPlantListener
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        sendPlantListener = context as SendPlantListener
+        PlantListAdapter()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,22 +95,26 @@ class PlantListFragment : Fragment() {
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
         plantListViewModel.getPlants().observe(requireActivity(), Observer { data ->
+            val loadedList = mutableListOf<Plant>()
             val resultList = data.body()?.results
             resultList?.forEachIndexed { index, element ->
-                var plantVO = Plant(
-                    index.toLong(),
+                val plantVO = Plant(
                     "Apple",
                     index,
                     // 결국 아래 값은 이미지의 url 값이다.
                     data.body()?.results?.get(index)?.urls?.get("raw").toString()
+
                 )
-                plantsData.add(plantVO)
+                loadedList.add(plantVO)
             }
-
+            plantlistAdapter.setOriginalData(loadedList)
+            plantlistAdapter.setData(loadedList)
             plantlistAdapter.setClickListener(listener)
+            //plantlistAdapter.setLongClickListener(longClickListener)
             recyclerView.adapter = plantlistAdapter
-        })
 
+            //recyclerView.getChildAt(2).setBackgroundColor(Color.BLUE)
+        })
 
         return view
     }
@@ -125,8 +122,9 @@ class PlantListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id: Int = item.itemId
         if (id == R.id.settings) {
-            filterPlants(!filterAll)
-            filterAll = !filterAll
+            plantlistAdapter.filterPlants()
+//            filterPlants(!filterAll)
+//            filterAll = !filterAll
             return true
         }
 
@@ -135,25 +133,25 @@ class PlantListFragment : Fragment() {
 
     fun filterPlants(filter: Boolean) {
 
-        // 모든 식물 목록을 보여준다.
-        if (filter) {
-            for (i: Int in 0..11) {
-                plantsData.add(hidePlants.get(i))
-            }
-            hidePlants.clear()
-        }
-        // 필터링된 4개의 식물만 보여준다.
-        else {
-            for (i in plantsData.size - 1 downTo 4) {
-                hidePlants.add(plantsData.get(i))
-            }
-
-            for (i in plantsData.size - 1 downTo 4) {
-                plantsData.removeAt(i)
-            }
-        }
-
-        plantlistAdapter.notifyDataSetChanged()
+//        // 모든 식물 목록을 보여준다.
+//        if (filter) {
+//            for (i: Int in 0..11) {
+//                plantsData.add(hidePlants.get(i))
+//            }
+//            hidePlants.clear()
+//        }
+//        // 필터링된 4개의 식물만 보여준다.
+//        else {
+//            for (i in plantlistAdapter.getData().size - 1 downTo 4) {
+//                hidePlants.add(plantsData.get(i))
+//            }
+//
+//            for (i in plantsData.size - 1 downTo 4) {
+//                plantsData.removeAt(i)
+//            }
+//        }
+//
+//        plantlistAdapter.notifyDataSetChanged()
     }
 
 }

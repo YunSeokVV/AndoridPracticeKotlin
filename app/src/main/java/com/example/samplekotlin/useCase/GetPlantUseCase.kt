@@ -10,7 +10,7 @@ import com.example.samplekotlin.repository.GetRemotePlantRepository
 import retrofit2.Response
 
 interface GetLocalPlantUserCase{
-    suspend fun loadPlant() : LiveData<List<Plant>>
+    fun loadPlant() : LiveData<List<Plant>>
 }
 
 interface GetRemotePlantUseCase {
@@ -25,7 +25,7 @@ class GetRemotePlantUseCaseImpl(private val getRemotePlantRepository: GetRemoteP
 }
 
 class GetLocalPlantUseCaseImpl(private val getLocalPlantRepository : GetLocalPlantRepository) : GetLocalPlantUserCase{
-    override suspend fun loadPlant(): LiveData<List<Plant>> {
+    override fun loadPlant(): LiveData<List<Plant>> {
         return getLocalPlantRepository.getPlant()
     }
 

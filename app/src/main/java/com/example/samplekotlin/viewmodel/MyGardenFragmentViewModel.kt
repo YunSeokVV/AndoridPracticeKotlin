@@ -9,8 +9,8 @@ import com.example.samplekotlin.repository.RoomRepository
 import com.orhanobut.logger.Logger
 
 class MyGardenFragmentViewModel(private val context: Context) : ViewModel() {
-    val dao = PlantDatabase.getInstance(context).plantDao()
-    val repository: RoomRepository = RoomRepository(dao)
+//    val dao = PlantDatabase.getInstance(context).plantDao()
+
 
 //    //DB에서 불러온 데이터를 관찰하는 LiveData가 필요하다.
 //    val allPlants: LiveData<List<Plant>> = repository.allPlants

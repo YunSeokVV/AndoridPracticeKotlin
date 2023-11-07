@@ -1,7 +1,11 @@
 package com.example.samplekotlin.util
 
 import android.content.Context
+import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.LiveData
+import com.example.samplekotlin.model.Plant
+import com.orhanobut.logger.Logger
 
 class CompanionUtil {
 
@@ -22,10 +26,16 @@ class CompanionUtil {
         //todo : GPT나 예제들을 보면 전부 instance를 var로 설정해서 아래쪽에 조건문을 달고 instance가 비었는지 안비었는지 확인하는 절차를 가지던데 그냥 나처럼 val 로 설정하면 안되나?
         //private var instance: CompanionUtil? = null
 
-        fun getInstance() : CompanionUtil {
-            return instance
+        fun likedPlant(imgURL : String, localPlant : LiveData<List<Plant>>) : Int{
+            var isVisible : Int = View.VISIBLE
+            localPlant.value?.forEach {
+                if(it.imageResource.equals(imgURL)){
+                    Logger.v("GONE")
+                    isVisible = View.GONE
+                }
+            }
+            return isVisible
         }
-
     }
 
     fun makeToastMessage(context : Context, msg : String){

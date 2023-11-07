@@ -28,20 +28,15 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 
 
-class MainActivity : SendPlantListener, AppCompatActivity() {
-//    private val mainActivityViewModel by lazy {
-//        ViewModelProvider(this).get(MainActivityViewModel::class.java)
-//    }
-
-
-    val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
+class MainActivity : AppCompatActivity() {
+    private val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
         viewModelFactory {
             initializer {
                 MainActivityViewModel(
                     GetLocalPlantUseCaseImpl(
                         GetLocalPlantRepositoryImpl(
                             GetPlantDataSourceImpl(
-                                PlantDatabase.getInstance(applicationContext).plantDao()
+                                PlantDatabase.getInstance(applicationContext)!!.plantDao()
                             )
                         )
                     )
@@ -98,16 +93,6 @@ class MainActivity : SendPlantListener, AppCompatActivity() {
 
         mainActivityViewModel.setfilterVisible()
         return false
-    }
-
-
-    override fun sendMessage(plant: Plant) {
-        val fragment = viewPagerAdapter.myGardenFragement
-        fragment.addLikedItem()
-    }
-
-    fun getLikedPlants(): MutableList<Plant> {
-        return viewPagerAdapter.myGardenFragement.likedData
     }
 
 }

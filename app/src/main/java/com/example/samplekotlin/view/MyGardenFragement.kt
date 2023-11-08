@@ -26,6 +26,7 @@ import com.orhanobut.logger.Logger
 
 
 class MyGardenFragement : Fragment() {
+
     private val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
         viewModelFactory {
             initializer {
@@ -33,7 +34,7 @@ class MyGardenFragement : Fragment() {
                     GetLocalPlantUseCaseImpl(
                         GetLocalPlantRepositoryImpl(
                             GetPlantDataSourceImpl(
-                                PlantDatabase.getInstance(requireContext().applicationContext)!!
+                                PlantDatabase.getInstance(requireContext().applicationContext)
                                     .plantDao()
                             )
                         )
@@ -44,29 +45,16 @@ class MyGardenFragement : Fragment() {
     }
 
     private val plantlistAdapter: PlantListAdapter by lazy {
-        PlantListAdapter()
-    }
-
-    private val clickListener by lazy {
-        (object : PlantListAdapter.OnItemClickListener {
-            override fun onItemClick(data: Plant) {
+        PlantListAdapter(object : PlantListAdapter.OnItemClickListener {
+            override fun onItemClick(plant: Plant) {
                 val transaction = parentFragmentManager.beginTransaction()
-                val plantDetailFragment = PlantDetailFragment(data)
+                val plantDetailFragment = PlantDetailFragment(plant)
                 transaction.replace(R.id.fragmentContainer, plantDetailFragment)
                 transaction.commit()
-
             }
+
         })
     }
-
-//    //todo : 클릭리스너에 대한 질문이 끝나면 이 코드를 설정하도록 하기
-//    private val longClickListener by lazy {
-//        (object : PlantListAdapter.OnItemLongClickListener {
-//            override fun onItemlongClick(plant: Plant) {
-//                //viewHolder.
-//            }
-//        })
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,17 +75,17 @@ class MyGardenFragement : Fragment() {
 
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        plantlistAdapter.setClickListener(clickListener)
+        //plantlistAdapter.setClickListener(clickListener)
         //plantlistAdapter.setLongClickListener(longClickListener)
 
         recyclerView.adapter = plantlistAdapter
 
         mainActivityViewModel.getLocalPlant()
+            //여기서 data(list)는 늘 새로운 주소가 반환된다. 한번 로그로 찍어봐바. 지금은 얕은복사로 되어있는데 깊은복사로 구현해야함.
             .observe(requireActivity(), Observer<List<Plant>> { data ->
                 Logger.v(data.toString())
                 plantlistAdapter.setData(data)
                 plantlistAdapter.notifyItemChanged()
-
             })
 
         return view

@@ -18,23 +18,17 @@ class CompanionUtil {
 //    }
 
     companion object {
-        private val instance = CompanionUtil()
-        // todo : by lazy를 사용해서 늦은 초기화를 하려고 했는데 애초에 by lazy가 어떤 값을 쓸 때 instance의 속성값을 변경해주는 역할을 하는건데... 굳이 by lazy를 쓸 필요는 없을듯
-//        private val instance by lazy{
-//
-//        }
-        //todo : GPT나 예제들을 보면 전부 instance를 var로 설정해서 아래쪽에 조건문을 달고 instance가 비었는지 안비었는지 확인하는 절차를 가지던데 그냥 나처럼 val 로 설정하면 안되나?
-        //private var instance: CompanionUtil? = null
-
         fun likedPlant(imgURL : String, localPlant : LiveData<List<Plant>>) : Int{
-            var isVisible : Int = View.VISIBLE
-            localPlant.value?.forEach {
-                if(it.imageResource.equals(imgURL)){
-                    Logger.v("GONE")
-                    isVisible = View.GONE
-                }
-            }
-            return isVisible
+//            var isVisible : Int = View.VISIBLE
+//            localPlant.value?.forEach {
+//                if(it.imageResource.equals(imgURL)){
+//                    Logger.v("GONE")
+//                    isVisible = View.GONE
+//                }
+//            }
+//            return isVisible
+
+            return if (localPlant.value?.find { it. imageResource == imgURL } != null) View.GONE else View.VISIBLE
         }
     }
 

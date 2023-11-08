@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
                     GetLocalPlantUseCaseImpl(
                         GetLocalPlantRepositoryImpl(
                             GetPlantDataSourceImpl(
-                                PlantDatabase.getInstance(applicationContext)!!.plantDao()
+                                PlantDatabase.getInstance(applicationContext).plantDao()
                             )
                         )
                     )

@@ -41,26 +41,6 @@ import com.orhanobut.logger.Logger
 
 
 class PlantListFragment : Fragment() {
-    private val listener by lazy {
-        (object : PlantListAdapter.OnItemClickListener {
-            override fun onItemClick(data: Plant) {
-                val transaction = parentFragmentManager.beginTransaction()
-                val plantDetailFragment = PlantDetailFragment(data)
-                transaction.replace(R.id.fragmentContainer, plantDetailFragment)
-                transaction.commit()
-            }
-        })
-    }
-
-//    //todo : 클릭리스너에 대한 질문이 끝나면 이 코드를 설정하도록 하기
-//    private val longClickListener by lazy {
-//        (object : PlantListAdapter.OnItemLongClickListener {
-//            override fun onItemlongClick(plant: Plant) {
-//                // holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.yellow))
-//            }
-//        })
-//    }
-
     private val plantListViewModel: PlantListFragmentViewModel by viewModels {
         viewModelFactory {
             initializer {
@@ -76,7 +56,15 @@ class PlantListFragment : Fragment() {
     }
 
     private val plantlistAdapter: PlantListAdapter by lazy {
-        PlantListAdapter()
+        PlantListAdapter(object : PlantListAdapter.OnItemClickListener {
+            override fun onItemClick(plant: Plant) {
+                val transaction = parentFragmentManager.beginTransaction()
+                val plantDetailFragment = PlantDetailFragment(plant)
+                transaction.replace(R.id.fragmentContainer, plantDetailFragment)
+                transaction.commit()
+            }
+
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,6 +87,7 @@ class PlantListFragment : Fragment() {
             val resultList = data.body()?.results
             resultList?.forEachIndexed { index, element ->
                 val plantVO = Plant(
+                    0,
                     "Apple",
                     index,
                     // 결국 아래 값은 이미지의 url 값이다.
@@ -109,11 +98,9 @@ class PlantListFragment : Fragment() {
             }
             plantlistAdapter.setOriginalData(loadedList)
             plantlistAdapter.setData(loadedList)
-            plantlistAdapter.setClickListener(listener)
+            //plantlistAdapter.setClickListener(listener)
             //plantlistAdapter.setLongClickListener(longClickListener)
             recyclerView.adapter = plantlistAdapter
-
-            //recyclerView.getChildAt(2).setBackgroundColor(Color.BLUE)
         })
 
         return view

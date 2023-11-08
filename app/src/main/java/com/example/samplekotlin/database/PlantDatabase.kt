@@ -17,7 +17,7 @@ abstract class PlantDatabase : RoomDatabase() {
     companion object {
         private var INSTANCE: PlantDatabase? = null
 
-        fun getInstance(context: Context): PlantDatabase? {
+        fun getInstance(context: Context): PlantDatabase {
             if (INSTANCE == null) {
                 //다른 메소드가 접근하는 것을 허용하지 않게끔 lock 시켜주고 하나의 스레드만 접근할 수 있게끔 해준다.
                 synchronized(PlantDatabase::class) {
@@ -26,11 +26,9 @@ abstract class PlantDatabase : RoomDatabase() {
                     ).build()
                 }
             }
-            return INSTANCE
+            return INSTANCE!!
         }
     }
-
-
 
 
 }

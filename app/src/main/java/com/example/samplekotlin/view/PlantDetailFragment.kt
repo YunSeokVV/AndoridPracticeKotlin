@@ -42,7 +42,7 @@ class PlantDetailFragment(private val plant: Plant) : Fragment() {
                     GetLocalPlantUseCaseImpl(
                         GetLocalPlantRepositoryImpl(
                             GetPlantDataSourceImpl(
-                                PlantDatabase.getInstance(requireActivity().applicationContext)!!
+                                PlantDatabase.getInstance(requireActivity().applicationContext)
                                     .plantDao()
                             )
                         )
@@ -59,7 +59,7 @@ class PlantDetailFragment(private val plant: Plant) : Fragment() {
                     InsertPlantUseCaseImpl(
                         InsertPlantRepositoryImpl(
                             InsertPlantDataSourceImpl(
-                                PlantDatabase.getInstance(requireContext())!!.plantDao()
+                                PlantDatabase.getInstance(requireContext()).plantDao()
                             )
                         )
                     )

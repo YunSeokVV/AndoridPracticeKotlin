@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class MainActivityViewModel(private val getLocalPlantUserCase: GetLocalPlantUserCase) : ViewModel() {
 
     lateinit var localPlant : LiveData<List<Plant>>
-    private var filterVisibleLiveData = MutableLiveData<Boolean>()
+    private val filterVisibleLiveData = MutableLiveData<Boolean>()
 
     init{
         loadLocalPlant()

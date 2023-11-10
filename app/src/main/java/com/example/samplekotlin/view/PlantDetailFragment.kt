@@ -8,12 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.viewModels
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.bumptech.glide.Glide
@@ -27,12 +23,9 @@ import com.example.samplekotlin.repository.InsertPlantRepositoryImpl
 import com.example.samplekotlin.useCase.GetLocalPlantUseCaseImpl
 import com.example.samplekotlin.useCase.InsertPlantUseCaseImpl
 import com.example.samplekotlin.util.CompanionUtil
-import com.example.samplekotlin.util.Util
 import com.example.samplekotlin.viewmodel.MainActivityViewModel
 import com.example.samplekotlin.viewmodel.PlantDetailFragmentViewModel
 import com.orhanobut.logger.Logger
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 
 class PlantDetailFragment(private val plant: Plant) : Fragment() {
     private val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
@@ -86,29 +79,29 @@ class PlantDetailFragment(private val plant: Plant) : Fragment() {
         val addBtn: ImageView = view.findViewById(R.id.addGardenBtn)
         addBtn.setImageResource(R.drawable.baseline_add_24)
 
-        planttNameTextView.text = plant?.name
+        planttNameTextView.text = plant?.location
         Glide.with(this).load(plant?.imageResource).into(plantImg)
         wateringNeedsTextView.text = "every ${plant?.waterPeriod.toString()} days"
 
-        mainActivityViewModel.getLocalPlant().observe(requireActivity(), Observer { data ->
+        mainActivityViewModel.localPlant.observe(requireActivity(), Observer { data ->
             Logger.v("getLocalPlant observer called1")
             data.forEach {
                 //addBtn.visibility = mainActivityViewModel.likedPlant(plant.imageResource,mainActivityViewModel.getLocalPlant())
                 addBtn.visibility = CompanionUtil.likedPlant(
                     plant.imageResource,
-                    mainActivityViewModel.getLocalPlant()
+                    mainActivityViewModel.localPlant
                 )
             }
         })
 
-        planttNameTextView.text = plant?.name
+        planttNameTextView.text = plant?.location
         Glide.with(this).load(plant?.imageResource).into(plantImg)
         val waterPeriod = plant?.waterPeriod
         wateringNeedsTextView.text = "every ${waterPeriod} days"
 
         addBtn.setOnClickListener(View.OnClickListener {
             viewModel.insertPlant(plant)
-            Util.makeToastMessage(requireContext(), resources.getString(R.string.add_garden))
+            CompanionUtil.makeToastMessage(requireContext(), resources.getString(R.string.add_garden))
         })
 
 

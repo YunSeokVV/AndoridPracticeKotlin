@@ -7,9 +7,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.viewpager2.widget.ViewPager2
@@ -17,8 +14,6 @@ import com.example.samplekotlin.R
 import com.example.samplekotlin.adpater.ViewPagerAdapter
 import com.example.samplekotlin.dataSource.local.GetPlantDataSourceImpl
 import com.example.samplekotlin.database.PlantDatabase
-import com.example.samplekotlin.util.SendPlantListener
-import com.example.samplekotlin.model.Plant
 import com.example.samplekotlin.repository.GetLocalPlantRepositoryImpl
 import com.example.samplekotlin.useCase.GetLocalPlantUseCaseImpl
 import com.example.samplekotlin.viewmodel.MainActivityViewModel
@@ -87,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.top_nav_menu, menu)
         val menuItem: MenuItem = menu.findItem(R.id.settings)
 
-        mainActivityViewModel.getfilterVisibleLiveData().observe(this) { isVisible ->
+        mainActivityViewModel.filterVisibleLiveData.observe(this) { isVisible ->
             menuItem.setVisible(isVisible)
         }
 

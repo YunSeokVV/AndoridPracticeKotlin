@@ -1,23 +1,6 @@
 package com.example.samplekotlin.view
 
-import android.content.Intent
-import android.os.Build
-import android.os.Bundle
-import android.os.Looper
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
-import com.example.samplekotlin.R
-import com.example.samplekotlin.database.PlantDatabase
-import com.example.samplekotlin.util.ExecutorInterface
-import com.example.samplekotlin.util.Util
-import com.example.samplekotlin.model.Plant
-import com.example.samplekotlin.viewmodel.MyGardenFragmentViewModel
-import com.example.samplekotlin.viewmodel.MyGardenFramgnetViewModelFactory
-import com.orhanobut.logger.Logger
 
 //해당 액티비티를 Framgnet로 변경하여서 사용하고 있습니다. 이 액티비티는 더이상 사용되지 않습니다.
 class PlantDetailActivity : AppCompatActivity() {

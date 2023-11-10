@@ -6,10 +6,9 @@ import java.io.Serializable
 
 @Entity
 data class Plant(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
-    val name: String,
+    val location: String,
     val waterPeriod: Int,
+    @PrimaryKey
     val imageResource:
     String
 ) : Serializable

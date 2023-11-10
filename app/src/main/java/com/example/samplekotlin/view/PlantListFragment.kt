@@ -82,24 +82,8 @@ class PlantListFragment : Fragment() {
         // 자바에서 레이아웃 매너저를 설정하는 방식과 다르다.
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
-        plantListViewModel.getPlants().observe(requireActivity(), Observer { data ->
-            val loadedList = mutableListOf<Plant>()
-            val resultList = data.body()?.results
-            resultList?.forEachIndexed { index, element ->
-                val plantVO = Plant(
-                    0,
-                    "Apple",
-                    index,
-                    // 결국 아래 값은 이미지의 url 값이다.
-                    data.body()?.results?.get(index)?.urls?.get("raw").toString()
-
-                )
-                loadedList.add(plantVO)
-            }
-            plantlistAdapter.setOriginalData(loadedList)
-            plantlistAdapter.setData(loadedList)
-            //plantlistAdapter.setClickListener(listener)
-            //plantlistAdapter.setLongClickListener(longClickListener)
+        plantListViewModel.plants.observe(requireActivity(), Observer { data ->
+            plantListViewModel.showRemotePlantData(data, plantlistAdapter)
             recyclerView.adapter = plantlistAdapter
         })
 
@@ -110,35 +94,10 @@ class PlantListFragment : Fragment() {
         val id: Int = item.itemId
         if (id == R.id.settings) {
             plantlistAdapter.filterPlants()
-//            filterPlants(!filterAll)
-//            filterAll = !filterAll
             return true
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    fun filterPlants(filter: Boolean) {
-
-//        // 모든 식물 목록을 보여준다.
-//        if (filter) {
-//            for (i: Int in 0..11) {
-//                plantsData.add(hidePlants.get(i))
-//            }
-//            hidePlants.clear()
-//        }
-//        // 필터링된 4개의 식물만 보여준다.
-//        else {
-//            for (i in plantlistAdapter.getData().size - 1 downTo 4) {
-//                hidePlants.add(plantsData.get(i))
-//            }
-//
-//            for (i in plantsData.size - 1 downTo 4) {
-//                plantsData.removeAt(i)
-//            }
-//        }
-//
-//        plantlistAdapter.notifyDataSetChanged()
     }
 
 }

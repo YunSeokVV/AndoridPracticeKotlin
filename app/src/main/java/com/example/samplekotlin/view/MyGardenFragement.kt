@@ -22,11 +22,8 @@ import com.example.samplekotlin.model.Plant
 import com.example.samplekotlin.repository.GetLocalPlantRepositoryImpl
 import com.example.samplekotlin.useCase.GetLocalPlantUseCaseImpl
 import com.example.samplekotlin.viewmodel.MainActivityViewModel
-import com.orhanobut.logger.Logger
-
 
 class MyGardenFragement : Fragment() {
-
     private val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
         viewModelFactory {
             initializer {
@@ -52,7 +49,6 @@ class MyGardenFragement : Fragment() {
                 transaction.replace(R.id.fragmentContainer, plantDetailFragment)
                 transaction.commit()
             }
-
         })
     }
 
@@ -63,29 +59,30 @@ class MyGardenFragement : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_my_garden_fragement, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.myPlantListrecyclerView)
-        val addPlant = view.findViewById<Button>(R.id.addPlantbtn)
+        val addPlantBtn = view.findViewById<Button>(R.id.addPlantbtn)
         val empty_text = view.findViewById<TextView>(R.id.empty_text)
-        addPlant.setOnClickListener(View.OnClickListener {
-            val viewPager2: ViewPager2 = requireActivity().findViewById(R.id.viewPager2)
-            viewPager2.setCurrentItem(1)
+        addPlantBtn.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View?) {
+                val viewPager2: ViewPager2 = requireActivity().findViewById(R.id.viewPager2)
+                viewPager2.setCurrentItem(1)
+            }
+
         })
 
-        addPlant.visibility = View.GONE
-        empty_text.visibility = View.GONE
-
         recyclerView.layoutManager = GridLayoutManager(context, 2)
-
-        //plantlistAdapter.setClickListener(clickListener)
-        //plantlistAdapter.setLongClickListener(longClickListener)
-
         recyclerView.adapter = plantlistAdapter
 
-        mainActivityViewModel.getLocalPlant()
-            //여기서 data(list)는 늘 새로운 주소가 반환된다. 한번 로그로 찍어봐바. 지금은 얕은복사로 되어있는데 깊은복사로 구현해야함.
+        mainActivityViewModel.localPlant
             .observe(requireActivity(), Observer<List<Plant>> { data ->
-                Logger.v(data.toString())
-                plantlistAdapter.setData(data)
-                plantlistAdapter.notifyItemChanged()
+                if (data.isNotEmpty()) {
+                    addPlantBtn.visibility = View.GONE
+                    empty_text.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
+                    plantlistAdapter.setData(data)
+                    plantlistAdapter.notifyItemChanged()
+                } else {
+                    recyclerView.visibility = View.GONE
+                }
             })
 
         return view

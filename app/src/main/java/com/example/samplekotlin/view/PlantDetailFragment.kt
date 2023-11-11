@@ -92,6 +92,7 @@ class PlantDetailFragment(private val plant: Plant) : Fragment() {
                     mainActivityViewModel.localPlant
                 )
             }
+
         })
 
         planttNameTextView.text = plant?.location
@@ -106,7 +107,6 @@ class PlantDetailFragment(private val plant: Plant) : Fragment() {
 
 
         backBtn.setOnClickListener(View.OnClickListener() {
-
             parentFragmentManager.beginTransaction().remove(this).commit()
             parentFragmentManager.popBackStack()
         })

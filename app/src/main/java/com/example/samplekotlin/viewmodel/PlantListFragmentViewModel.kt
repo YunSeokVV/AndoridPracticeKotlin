@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.samplekotlin.adpater.PlantListAdapter
+import com.example.samplekotlin.model.ImageURL
 import com.example.samplekotlin.model.Plant
 import com.example.samplekotlin.model.UnsplashResults
 import com.example.samplekotlin.useCase.GetRemotePlantUseCase
@@ -26,9 +27,8 @@ class PlantListFragmentViewModel(private val getPlantUseCase: GetRemotePlantUseC
     }
 
     fun showRemotePlantData(
-        response: Response<UnsplashResults>,
-        plantListAdapter: PlantListAdapter
-    ) {
+        response: Response<UnsplashResults>
+    ) : List<Plant> {
         val loadedList = mutableListOf<Plant>()
         val resultList = response.body()?.results
 
@@ -38,7 +38,6 @@ class PlantListFragmentViewModel(private val getPlantUseCase: GetRemotePlantUseC
             }
         }
 
-        plantListAdapter.setOriginalData(loadedList)
-        plantListAdapter.setData(loadedList)
+        return loadedList
     }
 }

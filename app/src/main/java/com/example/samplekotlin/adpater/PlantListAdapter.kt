@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.samplekotlin.R
 import com.example.samplekotlin.model.Plant
-import com.orhanobut.logger.Logger
 
 class PlantListAdapter(private val onItemClickListener: OnItemClickListener) :
     RecyclerView.Adapter<PlantListAdapter.ViewHolder>() {
@@ -94,7 +93,6 @@ class PlantListAdapter(private val onItemClickListener: OnItemClickListener) :
 
         // 아이템을 4개이하로 필터링 해야하는 경우
         if (!isFiltered) {
-
             // 원본 컬렉션의 각 요소에 지정된 변환 함수를 적용한 결과 중 널이 아닌 결과만 포함된 목록을 반환합니다.
             //val filtered: List<Plant> = originalData.mapNotNull {it}
             setData(filtered)

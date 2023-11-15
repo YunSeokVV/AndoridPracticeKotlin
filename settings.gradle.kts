@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SampleKotlin"
 include(":app")
- 
+include(":mylibrary")

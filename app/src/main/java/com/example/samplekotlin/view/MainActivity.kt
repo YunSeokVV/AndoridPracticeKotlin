@@ -1,46 +1,66 @@
 package com.example.samplekotlin.adpater.view
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.viewpager2.widget.ViewPager2
 import com.example.samplekotlin.R
 import com.example.samplekotlin.adpater.ViewPagerAdapter
+import com.example.samplekotlin.dataSource.local.GetPlantDataSourceImpl
+import com.example.samplekotlin.database.PlantDatabase
+import com.example.samplekotlin.repository.GetLocalPlantRepositoryImpl
+import com.example.samplekotlin.useCase.GetLocalPlantUseCaseImpl
+import com.example.samplekotlin.viewmodel.MainActivityViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.Logger
+
 
 class MainActivity : AppCompatActivity() {
+    private val mainActivityViewModel: MainActivityViewModel by viewModels<MainActivityViewModel> {
+        viewModelFactory {
+            initializer {
+                MainActivityViewModel(
+                    GetLocalPlantUseCaseImpl(
+                        GetLocalPlantRepositoryImpl(
+                            GetPlantDataSourceImpl(
+                                PlantDatabase.getInstance(applicationContext).plantDao()
+                            )
+                        )
+                    )
+                )
+            }
+        }
+    }
 
+    private val viewPagerAdapter = ViewPagerAdapter(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Logger.addLogAdapter(AndroidLogAdapter())
 
         val toolbar: Toolbar = findViewById(R.id.app_toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-
         val tableLayout: TabLayout = findViewById<TabLayout>(R.id.tabLayout)
         val viewPager2: ViewPager2 = findViewById(R.id.viewPager2)
 
-        viewPager2.adapter = ViewPagerAdapter(this)
+        viewPager2.adapter = viewPagerAdapter
 
-        TabLayoutMediator(tableLayout, viewPager2) {tab,position ->
+        TabLayoutMediator(tableLayout, viewPager2) { tab, position ->
             tab.text = when (position) {
                 0 -> "My garden"
                 1 -> "Plant list"
                 else -> throw IllegalArgumentException("Invalid position")
             }
 
-            // 왜인지는 모르겠으나 아래 코드는 안먹혀서 따로 아이콘에 대한 설정을 따로 해줬다.
-//            tab.icon = when(position) {
-//                0 -> resources.getDrawable(R.drawable.ic_my_garden_active)
-//                1 -> resources.getDrawable(R.drawable.ic_plant_list_active)
-//                else -> throw IllegalArgumentException("Invalid position")
-//            }
         }.attach()
 
         tableLayout.getTabAt(0)?.setIcon(R.drawable.ic_my_garden_active)
@@ -54,24 +74,21 @@ class MainActivity : AppCompatActivity() {
             ContextCompat.getColor(this, R.color.yellow)
         )
 
-        
     }
 
+    // onCreateOptionMenu 는 화면이 바뀔때 뷰가 새로 바뀌는 기회를 제공하기 위해서 계속 호출된다.
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // 메뉴 리소스 파일을 인플레이트하여 액션바 또는 툴바에 메뉴를 추가
         menuInflater.inflate(R.menu.top_nav_menu, menu)
-        return true
+        val menuItem: MenuItem = menu.findItem(R.id.settings)
+
+        mainActivityViewModel.filterVisibleLiveData.observe(this) { isVisible ->
+            menuItem.setVisible(isVisible)
+        }
+
+        mainActivityViewModel.setfilterVisible()
+        return false
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // 메뉴 아이템 선택 시 동작을 처리
-        return when (item.itemId) {
-            R.id.settings -> {
-                // 'Settings' 메뉴 아이템 선택 시 동작을 정의
-                // 예를 들어, 설정 화면으로 이동하거나 다른 작업 수행
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 }
+

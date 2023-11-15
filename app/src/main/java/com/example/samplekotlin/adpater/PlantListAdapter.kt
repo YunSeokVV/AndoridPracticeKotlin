@@ -6,34 +6,76 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.samplekotlin.R
-import com.example.samplekotlin.vo.Plant
+import com.example.samplekotlin.model.Plant
 
-class PlantListAdapter (private val data: List<Plant>) : RecyclerView.Adapter<PlantListAdapter.ViewHolder>(){
+class PlantListAdapter(private val onItemClickListener: OnItemClickListener) :
+    RecyclerView.Adapter<PlantListAdapter.ViewHolder>() {
+    private val plantData = mutableListOf<Plant>()
+
+    interface OnItemClickListener {
+        fun onItemClick(plant: Plant)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.plant_item_list,parent,false)
+        LayoutInflater.from(parent.context)
+        val itemView =
+            LayoutInflater.from(parent.context).inflate(R.layout.plant_item_list, parent, false)
         return ViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int){
-        val plantName:String = data.get(position).name
-        val imageResource:Int = data.get(position).imageResource
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(plantData[position])
 
-        holder.plantName.setText(plantName)
-        holder.plantImage.setImageResource(imageResource)
-        // 이미지뷰의 모서리를 둥글게 해주는 역할
-        holder.plantImage.clipToOutline = true
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return plantData.size
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var plantName: TextView = itemView.findViewById(R.id.plantName);
-        var plantImage: ImageView = itemView.findViewById<ImageView>(R.id.palntImage)
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val plantName: TextView = itemView.findViewById(R.id.plantName)
+        val plantImage: ImageView = itemView.findViewById<ImageView>(R.id.palntImage)
 
+        fun bind(item: Plant) {
+            plantName.text = item.location
+            Glide.with(itemView.context).load(item.imageResource).into(plantImage)
+            // 이미지뷰의 모서리를 약간 둥글게 만든다.
+            plantImage.clipToOutline = true
+
+        }
+
+        init {
+            itemView.setOnClickListener {
+                onItemClickListener.onItemClick(plantData.get(adapterPosition))
+            }
+
+            itemView.setOnLongClickListener {
+                plantName.setBackgroundResource(
+                    R.drawable.add_btn_yellow
+                )
+
+                true
+            }
+
+            plantName.setBackgroundResource(
+                R.drawable.add_btn
+            )
+
+        }
 
     }
+
+    fun setData(data: List<Plant>) {
+        this.plantData.clear()
+        this.plantData.addAll(data)
+        // 아이템이 총 몇개에서 몇개로 변하는지 정확하게 알 수 없기 때문에 이 메소드를 사용
+        notifyDataSetChanged()
+    }
+
 }

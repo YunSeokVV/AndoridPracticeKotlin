@@ -20,10 +20,11 @@
     <TextView
         android:id="@+id/plantName"
         android:layout_width="match_parent"
-        android:maxLines="1"
         android:layout_height="100dp"
         android:gravity="center"
+        android:maxLines="1"
         android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/palntImage" />

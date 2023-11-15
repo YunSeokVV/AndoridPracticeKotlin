@@ -79,7 +79,6 @@ class MyGardenFragement : Fragment() {
                     empty_text.visibility = View.GONE
                     recyclerView.visibility = View.VISIBLE
                     plantlistAdapter.setData(data)
-                    plantlistAdapter.notifyItemChanged()
                 } else {
                     recyclerView.visibility = View.GONE
                 }

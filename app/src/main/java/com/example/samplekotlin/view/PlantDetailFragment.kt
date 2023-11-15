@@ -84,9 +84,7 @@ class PlantDetailFragment(private val plant: Plant) : Fragment() {
         wateringNeedsTextView.text = "every ${plant?.waterPeriod.toString()} days"
 
         mainActivityViewModel.localPlant.observe(requireActivity(), Observer { data ->
-            Logger.v("getLocalPlant observer called1")
             data.forEach {
-                //addBtn.visibility = mainActivityViewModel.likedPlant(plant.imageResource,mainActivityViewModel.getLocalPlant())
                 addBtn.visibility = CompanionUtil.likedPlant(
                     plant.imageResource,
                     mainActivityViewModel.localPlant

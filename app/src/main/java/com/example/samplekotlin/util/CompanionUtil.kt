@@ -10,14 +10,6 @@ class CompanionUtil {
 
     companion object {
         fun likedPlant(imgURL : String, localPlant : LiveData<List<Plant>>) : Int{
-//            var isVisible : Int = View.VISIBLE
-//            localPlant.value?.forEach {
-//                if(it.imageResource.equals(imgURL)){
-//                    Logger.v("GONE")
-//                    isVisible = View.GONE
-//                }
-//            }
-//            return isVisible
 
             return if (localPlant.value?.find { it. imageResource == imgURL } != null) View.GONE else View.VISIBLE
         }

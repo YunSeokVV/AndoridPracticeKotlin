@@ -20,6 +20,7 @@ import com.example.samplekotlin.model.Plant
 import com.example.samplekotlin.repository.GetRemotePlantRepositoryImpl
 import com.example.samplekotlin.useCase.GetRemotePlantUseCaseImpl
 import com.example.samplekotlin.viewmodel.PlantListFragmentViewModel
+import com.orhanobut.logger.Logger
 
 class PlantListFragment : Fragment() {
     private val plantListViewModel: PlantListFragmentViewModel by viewModels {
@@ -63,10 +64,24 @@ class PlantListFragment : Fragment() {
         recyclerView.adapter = plantlistAdapter
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
+        // 서버에서 데이터를 받아오는 역할을 해주는 라이브데이터
         plantListViewModel.plants.observe(requireActivity(), Observer { data ->
-            plantlistAdapter.setOriginalData(plantListViewModel.showRemotePlantData(data))
             plantlistAdapter.setData(plantListViewModel.showRemotePlantData(data))
-            plantlistAdapter.notifyDataSetChanged()
+            plantListViewModel.setOriginalData(plantListViewModel.showRemotePlantData(data))
+        })
+
+        // 필터링 관련 라이브데이터
+        plantListViewModel.isFiltered.observe(requireActivity(), Observer { data ->
+            // 필터링한경우
+            if (data) {
+                val list = plantListViewModel.filterPlantData(plantListViewModel.getOriginalData())
+                plantlistAdapter.setData(list)
+            // 원본으로 되돌린 경우
+            } else {
+                if (plantListViewModel.getOriginalData() != null) {
+                    plantlistAdapter.setData(plantListViewModel.getOriginalData())
+                }
+            }
         })
 
         return view
@@ -75,7 +90,8 @@ class PlantListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id: Int = item.itemId
         if (id == R.id.settings) {
-            plantlistAdapter.filterPlants()
+            plantListViewModel.switchIsFiltred()
+
             return true
         }
 
